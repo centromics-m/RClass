@@ -18,6 +18,7 @@ This page provides the supplementary R code and data to reproduce the experiment
 
 # RClass2024
 
+``` r
 options(stringsAsFactors = FALSE) 
 getwd(); setwd()
 
@@ -519,7 +520,7 @@ for (i in names(xx)) {
 # Arrange heatmaps in a grid
 gridExtra::grid.arrange(grobs = a)
 
-
+``` 
 
 
 
