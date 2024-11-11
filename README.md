@@ -38,7 +38,7 @@ if (!require("devtools")) install.packages("devtools")
 
 ------------------------------------------------------------------------
 
-**Install package via Github (Recommended)**
+**Install package via Github**
 --------------------------------------------
 
 To install the latest version of package via Github, run following commands in R:
@@ -48,31 +48,6 @@ devtools::install_github("centromics-m/RClass2024")
 ```
 
 ------------------------------------------------------------------------
-
-**Install package from the source**
------------------------------------
-
--   **Linux/Mac OS**
-    -   Download the package \*.tar.gz.
-    -   Open a command prompt. then:
-
-``` r
-install.packages(path_of_the_downloaded_file, repos = NULL, type="source")
-```
-
--   **Windows**
-    -   Start by reviewing the section on Windows packages in [the R Installation and Administration manual](https://cran.r-project.org/doc/manuals/R-admin.html), then carefully follow the instructions from [The Windows toolset appendix](https://cran.r-project.org/doc/manuals/R-admin.html#The-Windows-toolset).
-    -   Download the package \*.tar.gz.
-    -   Make sure you have [Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed.
-    -   Open a command prompt. then:
-
-``` r
-install.packages(path_of_the_downloaded_file, repos = NULL, type="source")
-```
-
-------------------------------------------------------------------------
-
-
 
 ## 20241112
 
