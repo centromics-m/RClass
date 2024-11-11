@@ -62,11 +62,11 @@ loadUrl <- function(url, downloadPath = NA, sep=c("RData"," ", "," , "\t", ";", 
     try(assign(justLoaded, eval(as.symbol(justLoaded)),.GlobalEnv ), silent = T);
     if(class(justLoaded)=="try-error"){ justLoaded <- try(read.delim(tmpFile, ...), silent = T); message("Need 'sep' argument, is it txt file?")  }   
   } else if(sep == "xls") {
-    is.installed('readxl')
+    install_if_missing('readxl')
     justLoaded <- try(read_excel(tmpFile,...), silent = T)
     
   } else if(sep == "gsheet") {
-    is.installed('gsheet')
+    install_if_missing('gsheet')
     cat('gsheet should be public, click share-> Anyone with the link')
     justLoaded <- gsheet2tbl(url,...)
   } else {
