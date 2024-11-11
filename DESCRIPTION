@@ -1,0 +1,23 @@
+Package: RClass
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Sung Young",
+           family = "Kim",
+           role = c("aut", "cre"),
+           email = "palelamp@kku.ac.kr")
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Depends: 
+    R (>= 3.5.1)
+Imports: 
+    ggplot2,
+    ggrepel,
+    shiny
+Suggests: 
+    ComplexHeatmaps,
+    limma
+bioViews: 
+Encoding: UTF-8
+ImportsFrom: 
+LazyData: true
