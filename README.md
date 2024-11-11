@@ -112,9 +112,6 @@ grid.arrange(p1, p2, ncol = 2)
 
 
 
-
-
-
 ####################################################### 
 # 2. Standard Error & Central Limit Theorem Simulation 
 ####################################################### 
@@ -183,9 +180,6 @@ shinyApp(ui, server)
 
 
 
-
-
-
 ####################################################### 
 # 3. Chi-square test
 ####################################################### 
@@ -204,12 +198,8 @@ total_sum <- sum(observed)
 # Create expected frequency matrix
 expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
 
-# Calculate expected frequencies
-for (i in 1:nrow(observed)) {
-  for (j in 1:ncol(observed)) {
-    expected[i, j] <- (row_sums[i] * col_sums[j]) / total_sum
-  }
-}
+# Calculate expected frequencies using a for loop <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
+expected
 
 # Calculate Chi-squared statistic
 chi_squared <- sum((observed - expected)^2 / expected)
@@ -222,11 +212,6 @@ print(paste("Degrees of freedom:", df))
 # Calculate p-value
 p_value <- 1 - pchisq(chi_squared, df)
 print(paste("p-value:", p_value))
-
-
-
-
-
 
 
 
@@ -249,7 +234,7 @@ U_test <- function(x, y, alternative = "two.sided") {
   U <- min(U_x, U_y)
   
   # Calculate the mean and standard deviation of U under the null hypothesis
-  mean_U <- (n_x * n_y) / 2
+  mean_U    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
   sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
   
   # Calculate p-value based on test alternative
@@ -284,11 +269,6 @@ wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "less")
 
 
 
-
-
-
-
-
 ####################################################### 
 # 5-1. Permutation t-test 
 ####################################################### 
@@ -311,8 +291,7 @@ for (i in 1:n_permutations) {
   perm_diffs[i] <- mean(combined[1:20]) - mean(combined[21:40])  # Calculate mean difference
 }
 
-# Calculate p-value
-p_value <- mean(abs(perm_diffs) >= abs(obs_diff))
+# Calculate p-value <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
 p_value
 
 
@@ -358,12 +337,6 @@ for (i in 1:nsim) {
 }
 p.value <- ntail / (nsim + 1)
 p.value
-
-
-
-
-
-
 
 
 
