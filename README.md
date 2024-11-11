@@ -198,8 +198,8 @@ total_sum <- sum(observed)
 # Create expected frequency matrix
 expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
 
-# Calculate expected frequencies using a for loop <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
-expected
+# Calculate expected frequencies using a for loop 
+expected   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
 
 # Calculate Chi-squared statistic
 chi_squared <- sum((observed - expected)^2 / expected)
@@ -291,8 +291,8 @@ for (i in 1:n_permutations) {
   perm_diffs[i] <- mean(combined[1:20]) - mean(combined[21:40])  # Calculate mean difference
 }
 
-# Calculate p-value <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
-p_value
+# Calculate p-value 
+p_value   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
 
 
 
