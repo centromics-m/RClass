@@ -84,7 +84,41 @@ loadUrl <- function(url, downloadPath = NA, sep=c("RData"," ", "," , "\t", ";", 
 }
 
 
+             
+#' @export 
+makeSimData2 <- function(nGenes = 25, nSamples = 50, contrast = 2, noise = 3, seed=1234, technique = c("microarray", "rna_seq_counts", "sc_rna_seq_counts"))
+{
+  set.seed(seed)
+  technique=match.arg(technique)
+  if(technique == "microarray") {
+    x <- matrix(rlnorm(nGenes * nSamples), nGenes) 
+    x <- apply(x, 2, function(k) { k + rnorm(n, 0, noise * sd(k, na.rm=T)) }) # add noise
+  } else if (technique == "rna_seq_counts") {
+    x <- matrix(rnbinom(nGenes * nSamples, size = 3, mu = 20), nGenes) # rnbinom은 R에서 음이항 분포로부터 난수를 생성하는 함수
+  } else {
+    x <- matrix(rnbinom(nGenes * nSamples, size = 3, mu = 20), nGenes)
+    x[sample(1:(nGenes * nSamples), (nGenes * nSamples) * 0.5)] <- 0 # Zero-inflated Negative Binomial Distribution 50%
+  }
+  
+  rownames(x) <- paste0("G", 1:nGenes)
+  colnames(x) <- paste0("S", 1:nSamples)
+  
+  x[1:floor(nGenes * 0.2), floor(nSamples/2):nSamples ] <- x[1:floor(nGenes * 0.2), floor(nSamples/2):nSamples]*contrast
+  
+  hist(x, breaks = 30, col = "skyblue", main = technique)
+  
+  time <- sample(100:5000, nSamples, replace=T)
+  status <- sample(0:1, nSamples, replace=T)
+  sex = rep(1, nSamples); sex[1:floor(nSamples/2)] <- 0
+  y <- data.frame(time=time, status=status, age = sample(3:100, nSamples, replace=T), sex = sex, stage = sample(1:4, nSamples, replace = T))
+  rownames(y) <- colnames(x)
+  return(list(exp=x, meta=y))
+}
 
+
+
+
+             
 #' @export 
 browseEntrez <- function(entrezIDs) {
   for(i in entrezIDs) {
