@@ -21,7 +21,7 @@ shiny::runApp(system.file("shiny", package=loc))  }
 
 
 #' @export 
-install_if_missing <- function(pkgs = NULL, bioc_pkgs = NULL) {
+install_if_missing <- function(pkgs = NULL, bioc_pkgs = NULL, load = TRUE) {
   if (!is.null(pkgs)) {
     missing_cran_pkgs <- pkgs[!pkgs %in% installed.packages()[, "Package"]]
     if (length(missing_cran_pkgs) > 0) {
@@ -29,6 +29,10 @@ install_if_missing <- function(pkgs = NULL, bioc_pkgs = NULL) {
       message(paste("You have successfully installed the following CRAN packages:", paste(missing_cran_pkgs, collapse = ", ")))
     } else {
       message("All specified CRAN packages are already installed.")
+    }
+      if (load) {
+      lapply(pkgs, function(pkg) library(pkg, character.only = TRUE))
+      message(paste("Loaded the following CRAN packages:", paste(pkgs, collapse = ", ")))
     }
   }
   if (!is.null(bioc_pkgs)) {
@@ -41,6 +45,10 @@ install_if_missing <- function(pkgs = NULL, bioc_pkgs = NULL) {
       message(paste("You have successfully installed the following Bioconductor packages:", paste(missing_bioc_pkgs, collapse = ", ")))
     } else {
       message("All specified Bioconductor packages are already installed.")
+    }
+      if (load) {
+      lapply(bioc_pkgs, function(pkg) library(pkg, character.only = TRUE))
+      message(paste("Loaded the following Bioconductor packages:", paste(bioc_pkgs, collapse = ", ")))
     }
   }
 }
