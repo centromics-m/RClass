@@ -1,5 +1,3 @@
-# RClass2024
-
 <!--   주석처리  toc:table of content    
 author: "Sung Young Kim, MD, PhD^[mailto:palelamp@gmail.com]</center>"
 date: "03 June 2020"
@@ -18,7 +16,7 @@ output:
 This page provides the supplementary R code and data to reproduce the experiments in the following paper : **Accurate prediction of acquired EGFR TKIs resistance using a pathway-based individualized machine learning approach**  
 -->
 
-------------------------------------------------------------------------
+# RClass2024
 
 **Main Dataset**
 ----------------
@@ -65,7 +63,7 @@ devtools::install_version("shiny", "0.8.0")
 To install the latest version of package via Github, run following commands in R:
 
 ``` r
-devtools::install_github("malcogene/RClass")
+devtools::install_github("centromics-m/RClass2024")
 ```
 
 ------------------------------------------------------------------------
