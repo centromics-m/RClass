@@ -92,7 +92,7 @@ makeSimData2 <- function(nGenes = 25, nSamples = 50, contrast = 2, noise = 3, se
   technique=match.arg(technique)
   if(technique == "microarray") {
     x <- matrix(rlnorm(nGenes * nSamples), nGenes) 
-    x <- apply(x, 2, function(k) { k + rnorm(n, 0, noise * sd(k, na.rm=T)) }) # add noise
+    x <- apply(x, 2, function(k) { k + rnorm(nGenes, 0, noise * sd(k, na.rm=T)) }) # add noise
   } else if (technique == "rna_seq_counts") {
     x <- matrix(rnbinom(nGenes * nSamples, size = 3, mu = 20), nGenes) # rnbinom은 R에서 음이항 분포로부터 난수를 생성하는 함수
   } else {
