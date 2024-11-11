@@ -199,7 +199,7 @@ total_sum <- sum(observed)
 expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
 
 # Calculate expected frequencies using a for loop 
-expected   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
+expected   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
 
 # Calculate Chi-squared statistic
 chi_squared <- sum((observed - expected)^2 / expected)
@@ -234,7 +234,7 @@ U_test <- function(x, y, alternative = "two.sided") {
   U <- min(U_x, U_y)
   
   # Calculate the mean and standard deviation of U under the null hypothesis
-  mean_U    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
+  mean_U    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
   sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
   
   # Calculate p-value based on test alternative
