@@ -3,7 +3,6 @@
 export(AppUI)
 export(DEGs)
 export(browseEntrez)
-export(is.installed)
 export(loadUrl)
 export(normalize.q)
 export(peep)
