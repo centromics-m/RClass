@@ -1,5 +1,8 @@
 options(stringsAsFactors = FALSE)  
 
+
+
+
 AppUI <- function() {
   currentfilePath <- dirname(rstudioapi::getSourceEditorContext()$path)
   pkgname <-(pkg <- strsplit(currentfilePath, '/'))[[1]][length(pkg[[1]])-1]; pkgname 
@@ -18,57 +21,29 @@ shiny::runApp(system.file("shiny", package=loc))  }
 
 
 #' @export 
-is.installed <- function(RequiredPackages) {
-  
-  pinx <- which(RequiredPackages %in% installed.packages()[,1])
-  if(length(pinx) !=0) {installPackages<- RequiredPackages[-pinx] };
-  if(length(installPackages) !=0) {
-  Inx <- readline(prompt= sprintf("\nThis function needs %s package(s). Whould you like to install?\n\nEnter Y or an empty line to skip install and return:\n\n", installPackages) );
-  if( Inx == 'y' || Inx == 'Y' ) {
-    for (i in installPackages) { # Installs packages if not yet installed
-      # if (!is.element(i, installed.packages()[,1]))  
-      install.packages(i)
-      require(i, character.only = T)
-      # }
-    } } else { stop() } 
-  } else {
-    for (i in RequiredPackages) {
-      require(i, character.only = T)
-     }  
+install_if_missing <- function(pkgs = NULL, bioc_pkgs = NULL) {
+  if (!is.null(pkgs)) {
+    missing_cran_pkgs <- pkgs[!pkgs %in% installed.packages()[, "Package"]]
+    if (length(missing_cran_pkgs) > 0) {
+      install.packages(missing_cran_pkgs)
+      message(paste("You have successfully installed the following CRAN packages:", paste(missing_cran_pkgs, collapse = ", ")))
+    } else {
+      message("All specified CRAN packages are already installed.")
+    }
   }
+  if (!is.null(bioc_pkgs)) {
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {
+      install.packages("BiocManager")
+    }
+    missing_bioc_pkgs <- bioc_pkgs[!bioc_pkgs %in% installed.packages()[, "Package"]]
+    if (length(missing_bioc_pkgs) > 0) {
+      BiocManager::install(missing_bioc_pkgs)
+      message(paste("You have successfully installed the following Bioconductor packages:", paste(missing_bioc_pkgs, collapse = ", ")))
+    } else {
+      message("All specified Bioconductor packages are already installed.")
+    }
   }
-
-
-
-
-
-
-
-
-
-#' @export 
-is.installed.bioconductor <- function(RequiredPackages) {
-  pinx <- which(RequiredPackages %in% installed.packages()[,1])
-  pinx <- which(RequiredPackages %in% installed.packages()[,1])
-  if(length(pinx) !=0) {installPackages<- RequiredPackages[-pinx] };
-  if(length(installPackages) !=0) {
-  Inx <- readline(prompt= sprintf("\nThis function needs %s bioconductor package(s). Whould you like to install?\n\nEnter Y or an empty line to skip install and return", installPackages) );
-  if( Inx == 'y' || Inx == 'Y' ) {
-    for (i in installPackages) { # Installs packages if not yet installed
-      # if (!is.element(i, installed.packages()[,1])) {
-      if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-      BiocManager::install(i)
-      require(i, character.only = T)
-      # }
-    } } else { stop() }
-  } else {
-    for (i in RequiredPackages) {
-      require(i, character.only = T)
-    }  
-  }
-  }
-
+}
 
 
 #' @export 
@@ -189,20 +164,18 @@ DEGs <- function(Exp, cl, adj.pval = 0.1,  logFC = 2, geomTextN=5, heatmapUpN = 
     
     if(dim(Exp)[1] >= heatmapUpN*2 ) {
       bluered <- colorRampPalette(c("blue", "white", "red"))(256)
-      # stats::heatmap(Exp[rbind(tT.down[1:heatmapUpN, ],tT.up[heatmapUpN:1, ])$Gene,], col = bluered, scale = "row", main = sprintf("top%s", heatmapUpN*2), Colv = NA, Rowv=NA    )
+      stats::heatmap(Exp[rbind(tT.down[1:heatmapUpN, ],tT.up[heatmapUpN:1, ])$Gene,], col = bluered, scale = "row", main = sprintf("top%s", heatmapUpN*2), Colv = NA, Rowv=NA    )
       
       # if(HUGO) { colnames(d)[1:dim(matGS)[1]] <- .mapid(colnames(d)[1:dim(matGS)[1]]) }
       
-      colse=c("#00000020", "#000000", "#0000BF10", "#0000BF30", "#0000BF50", "#0000BF70","#0000BF90","#0000BF")
-      colTemp <- colse[as.numeric(as.factor(cl[,1]))]
-      names(colTemp ) <- cl[,1]
-      colTemp<-list(colTemp); names(colTemp) <- colnames(cl)[1] 
+      # colse=c("#00000020", "#000000", "#0000BF10", "#0000BF30", "#0000BF50", "#0000BF70","#0000BF90","#0000BF")
+      # colTemp <- colse[as.numeric(as.factor(cl[,1]))]
+      # names(colTemp ) <- cl[,1]
+      # colTemp<-list(colTemp); names(colTemp) <- colnames(cl)[1] 
       
+      # h <- Heatmap( t(scale(t(d<-Exp[rbind(tT.up[1:heatmapUpN, ], tT.down[heatmapUpN:1, ])$Gene,]))),  col = bluered, name="Exprs", rect_gp = rect_gp, cluster_rows = T, cluster_columns = T, show_row_names = T, show_column_names=show_column_names, row_names_gp =gpar(fontsize = 5), split = data.frame(cyl = factor(c(rep('UP', heatmapUpN), rep('DOWN', heatmapUpN)), levels=c('UP','DOWN' ))),gap = unit(1.5, "mm"), top_annotation = HeatmapAnnotation(df=cl, col=colTemp, show_annotation_name = T, annotation_name_gp = gpar(fontsize = 7), annotation_name_side ='left', annotation_height=c(1.5), use_raster = T ) ) 
 
-
-      h <- Heatmap( t(scale(t(d<-Exp[rbind(tT.up[1:heatmapUpN, ], tT.down[heatmapUpN:1, ])$Gene,]))),  col = bluered, name="Exprs", rect_gp = rect_gp, cluster_rows = T, cluster_columns = T, show_row_names = T, show_column_names=show_column_names, row_names_gp =gpar(fontsize = 5), split = data.frame(cyl = factor(c(rep('UP', heatmapUpN), rep('DOWN', heatmapUpN)), levels=c('UP','DOWN' ))),gap = unit(1.5, "mm"), top_annotation = HeatmapAnnotation(df=cl, col=colTemp, show_annotation_name = T, annotation_name_gp = gpar(fontsize = 7), annotation_name_side ='left', annotation_height=c(1.5), use_raster = T ) ) 
-
-      draw(h)
+      # draw(h)
     }
   }
   if(PDF) { dev.off() 
