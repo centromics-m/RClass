@@ -59,6 +59,7 @@ pkgs = c("BiocManager", "MASS", "preprocessCore", "ggplot2", "gridExtra", "ggplo
 bioc_pkgs = c("limma")
 install_if_missing(pkgs, bioc_pkgs)
 
+library("RClass")
 
 ####################################################### 
 # 1. Normal Distribution 
