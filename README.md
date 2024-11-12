@@ -521,6 +521,185 @@ for (i in names(xx)) {
 # Arrange heatmaps in a grid
 gridExtra::grid.arrange(grobs = a)
 
+
+
+
+
+####################################################### 
+# 8. AUC & Confusion_matrix
+#######################################################
+
+calculate_auc <- function(true_labels, probabilities) {
+  # Calculate the ranks of the probabilities (lower values have lower ranks)
+  ranks <- rank(probabilities)
+  
+  # Get the ranks of the positive class instances
+  pos_ranks <- ranks[true_labels == 1]
+  
+  # Count the number of negative class instances
+  neg_count <- sum(true_labels == 0)
+  
+  # Calculate the sum of ranks for the positive class
+  rank_sum_pos <- sum(pos_ranks)
+  
+  # Calculate the U statistic for rank-sum
+  u_statistic <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q4
+  
+  # Calculate AUC
+  auc <- u_statistic / (length(pos_ranks) * neg_count)
+  return(auc)
+}
+
+
+true_labels <- c(1, 0, 1, 0, 1, 0, 1, 0)
+probabilities <- c(0.9, 0.4, 0.8, 0.3, 0.6, 0.2, 0.7, 0.1)
+# probabilities <- c(0.51, 0.49, 0.51, 0.49, 0.51, 0.49, 0.51, 0.49)
+# probabilities <- c(0.51, 0.49, 0.51, 0.49, 0.51, 0.49, 0.51, 0.6)
+
+# Calculate AUC
+auc_value <- calculate_auc(true_labels, probabilities)
+cat("AUC:", auc_value, "\n")
+
+# Confusion matrix based on a threshold (0.5 in this case)
+threshold <- 0.5
+predictions <- ifelse(probabilities >= threshold, 1, 0)
+
+# Create confusion matrix
+confusion_matrix <- table(Predicted = predictions, Actual = true_labels)
+print("Confusion Matrix:")
+print(confusion_matrix)
+
+
+# Extract values from confusion matrix
+TP <- confusion_matrix[2, 2]  # True Positives
+TN <-     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
+FP <- 
+FN <- 
+
+# Calculate performance metrics
+precision <- 
+accuracy <- 
+recall <- 
+specificity <- 
+false_discovery_rate <- 
+
+
+
+
+
+####################################################### 
+# 8. Logistic regression
+#######################################################
+# Sample data
+data <- data.frame(
+  smoke = c(0, 1, 0, 1, 0, 1, 0, 0, 1, 1),    # Binary outcome (smoking or not)
+  age = c(22, 45, 30, 50, 27, 37, 26, 34, 48, 29), # Predictor variable: age
+  income = c(3, 2, 4, 1, 4, 3, 3, 4, 1, 2)   # Predictor variable: income level (1 = low, 5 = high)
+); data 
+
+# Fit binomial logistic regression model
+model <- glm(smoke ~ age + income, family = binomial(link = "logit"), data = data)
+
+# View model summary
+summary(model)
+
+# Predict probabilities of smoking
+# This will output the predicted probabilities (from 0 to 1) for each individual in the dataset. These probabilities indicate the likelihood of each individual being a smoker based on their age and income.
+predicted_probs <- predict(model, type = "response")
+print(predicted_probs)
+
+# Convert probabilities to binary predictions with a 0.5 threshold
+predicted_labels <- ifelse(predicted_probs > 0.5, 1, 0)
+print(predicted_labels)
+
+# Create the confusion matrix
+true_labels <- data$smoke  # Actual values of the response variable
+confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
+print(confusion_matrix)
+
+auc_value <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
+
+
+
+
+
+
+####################################################### 
+# 8. Logistic regression - 10 fold CV
+#######################################################
+
+# Set up random seed for reproducibility
+set.seed(123)
+
+# Generate sample data
+n <- 200
+data <- data.frame(
+  x1 = rnorm(n),             # Predictor variable 1 (normally distributed)
+  x2 = rnorm(n),             # Predictor variable 2 (normally distributed)
+  y = rbinom(n, 1, prob = 0.5)  # Binary outcome variable (0 or 1) with a 50% probability
+)
+
+# Split data into training and test sets (70% training, 30% test)
+train_index <- sample(1:n, size = 0.7 * n, replace = FALSE)  # Randomly select indices for training set
+train_data <- data[train_index, ]  # Training data subset
+test_data <- data[-train_index, ]  # Test data subset
+
+# Set up 10-fold cross-validation
+k <- 10
+folds <- sample(rep(1:k, length.out = nrow(train_data)))  # Randomly assign each row to one of the 10 folds
+
+# Initialize vector to store AUC values from each fold
+cv_auc <- c()
+
+# Perform cross-validation to evaluate AUC
+for (i in 1:k) {
+  # Divide training data into fold-specific training and validation sets
+  fold_train <- train_data[folds != i, ]  # Data for training on this fold
+  fold_val <- train_data[folds == i, ]    # Data for validation on this fold
+  
+  # Fit logistic regression model on fold training data
+  model <- glm(y ~ x1 + x2, data = fold_train, family = "binomial")
+  
+  # Predict probabilities on fold validation data
+  pred_probs <- predict(model, newdata = fold_val, type = "response")
+  
+  # Calculate AUC for this fold using U-statistic
+  fold_auc <- calculate_auc(fold_val$y, pred_probs)
+  cv_auc <- c(cv_auc, fold_auc)  # Store AUC for this fold
+}
+
+# Print mean AUC from 10-fold cross-validation
+cat("10-Fold Cross-Validation AUC:", mean(cv_auc), "\n")
+
+# Train the final model on the entire training set
+final_model <- glm(y ~ x1 + x2, data = train_data, family = "binomial")
+
+# Predict probabilities on the test set
+test_probs <- predict(final_model, newdata = test_data, type = "response")
+
+# Calculate and print AUC for test set
+test_auc <- calculate_auc(test_data$y, test_probs)
+cat("Test Set AUC:", test_auc, "\n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ``` 
 
 
