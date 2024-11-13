@@ -21,7 +21,6 @@ This page provides the supplementary R code and data to reproduce the experiment
 **Main Dataset**
 ----------------
 
--   The main method function R file can be downloaded from [here](https://raw.githubusercontent.com/centromics-m/RClass2024/refs/heads/main/R/main.R)
 -   Preprocessed dataset can be downloaded from [here](https://github.com/centromics-m/RClass2024/raw/refs/heads/main/data/LC_NT_RClass.rda)
 -   The pathways used for model construction can be downloaded from [here](https://github.com/centromics-m/RClass2024/raw/refs/heads/main/data/pathwayDB_KEGG_202411_RClass.rda)
 
