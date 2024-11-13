@@ -265,7 +265,7 @@ U_test <- function(x, y, alternative = "two.sided") {
   U <- min(U_x, U_y)
   
   # Calculate the mean and standard deviation of U under the null hypothesis
-  mean_U    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
+  mean_U  <- (n_x * n_y)/2   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
   sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
   
   # Calculate p-value based on test alternative
