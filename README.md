@@ -57,9 +57,52 @@ getwd(); setwd()
 
 pkgs = c("BiocManager", "MASS", "preprocessCore", "ggplot2", "gridExtra", "ggplotify", "pheatmap", "factoextra", "shiny", "glmnet" )
 bioc_pkgs = c("limma")
-install_if_missing(pkgs, bioc_pkgs)
 
 library("RClass")
+
+install_if_missing(pkgs, bioc_pkgs)
+RClass:::install_if_missing(pkgs, bioc_pkgs)
+
+
+
+
+a = matrix(1:12, 4, 3);a
+nrow(a)
+ncol(a)
+rownames(a) <- paste0("row_", 1:nrow(a))
+colnames(a) <- paste0("col_", 1:ncol(a))
+a
+b <- data.frame(x = 1:3, y = letters[1:3]) #  각 열은 다른 데이터 타입 가능
+c <- list(a=a, b=b)
+c[2]  # 첫 번째 요소를 리스트로 반환
+c[[2]] # 첫 번째 요소를 요소자체를 반환
+scale(1:12)
+sample(1:12, size = 10, replace = T)
+
+apply(a, 2, scale)
+lapply(c, function(x) x[3, 2] )
+lapply(c, function(x) colSums(x) )
+
+set.seed(123) 
+result_replicate <- replicate(10, sample(1:12, 5)); result_replicate
+result_lapply <- lapply(1:10, function(x) sample(1:12, 5)); result_lapply
+result_for <-list()  
+for (i in 1:10) {
+  result_for[[i]] <- sample(1:12, 5)
+}; result_for
+
+sort(c(10, 20, 10, 30, 20))
+rank(c(10, 20, 10, 30, 20)) # 순위를 반환하며, 같은 값에 대해 평균 순위를 부여
+order(c(10, 20, 10, 30, 20))
+# This code returns the 1st quartile, median, and 3rd quartile for the data set.
+quantile(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), probs = c(0.25, 0.5, 0.75))
+# do.call(what, args, quote = FALSE, ...) # what: 호출할 함수의 이름, args: 함수에 전달할 인자들의 리스트.
+args <- list(1, 2, 3)
+do.call(sum, args)
+
+
+
+
 
 ####################################################### 
 # 1. Normal Distribution 
