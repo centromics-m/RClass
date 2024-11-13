@@ -716,6 +716,34 @@ cat("Test Set AUC:", test_auc, "\n")
 
 
 
+####################################################### 
+# 9. Gene Set Enrichment Analysis
+#######################################################
+
+# Access expression data from TCGA liver cancer
+LC_NT_RClass
+
+# Create a gene list ordered by expression level in descending order
+geneList = LC_NT_RClass$expr[order(LC_NT_RClass$expr[,1], decreasing = T), 1]
+
+# Reshape the pathway database into a long format and keep specific columns
+df <- reshape::melt(pathwayDB_KEGG_202411_RClass)
+df <- df[, c(2, 1)]
+
+# Run Gene Set Enrichment Analysis (GSEA) with the gene list and pathway data
+# and calculate pairwise term similarities
+GSEA.results <- pairwise_termsim(GSEA(geneList, TERM2GENE=df))
+
+# Plot GSEA results for the top pathway
+gseaplot2(GSEA.results, GSEA.results$ID[1])
+
+# Generate various visualizations of GSEA results
+emapplot(GSEA.results)     # Enrichment map plot
+cnetplot(GSEA.results)     # Concept network plot
+heatplot(GSEA.results)     # Heatmap plot
+ridgeplot(GSEA.results)    # Ridge plot
+
+
 
 
 
