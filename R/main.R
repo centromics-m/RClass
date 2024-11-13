@@ -171,9 +171,7 @@ normalize.q <- function(x= data.frame(matrix(sample(12, replace = T), 4)), filte
 DEGs <- function(Exp, cl, adj.pval = 0.1,  logFC = 2, geomTextN=5, heatmapUpN = 25, plotDEG =T, multipleRegression=F, rowCounts=F, meanFilter=10, PDF=T, cname='temp', show_column_names=T, rect_gp = gpar(col = NA, lty = 1, lwd = 0.2)) {
   try(dev.off(), silent = T)
   
-  is.installed(c('ggplot2', 'ggrepel'))
-  is.installed.bioconductor(c('limma', 'ComplexHeatmap'))
-  
+  install_if_missing(c('ggplot2', 'ggrepel'), c('limma', 'ComplexHeatmap'))
   
   if(rowCounts) { Exp <- Exp[apply(Exp, 1, mean) > meanFilter, ]; Exp <- voom(Exp, plot = T) }
   
@@ -232,8 +230,8 @@ DEGs <- function(Exp, cl, adj.pval = 0.1,  logFC = 2, geomTextN=5, heatmapUpN = 
 #' @export                                                      
 RP.custom <- function(s,FDRcutoff=.1) {
   
-  is.installed.bioconductor(c('RankProd'))
-
+  install_if_missing(c('ggplot2'), c('RankProd'))
+  
   for(i in 1: length(s)) { s[[i]]$y <- as.numeric(as.factor(s[[i]]$y[,1]))-1 
   rownames(s[[i]]$x) <-  gsub("///.*", "", rownames(s[[i]]$x))
   }  
