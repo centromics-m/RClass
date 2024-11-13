@@ -128,30 +128,6 @@ y <- dnorm(x, mean = mean, sd = sd)
 u.q <- qnorm(0.975, mean = mean, sd = sd) # Upper 2.5% quantile
 l.q <- qnorm(0.025, mean = mean, sd = sd) # Lower 2.5% quantile
 
-# Cumulative distribution function (CDF) between quantiles
-prob_95 <- pnorm(u.q, mean = mean, sd = sd) - pnorm(l.q, mean = mean, sd = sd)
-
-# Create a data frame for plotting
-df <- data.frame(x, y)
-
-# Plot histogram of normal distribution
-p1 <- ggplot(df, aes(x)) + 
-  geom_histogram(binwidth = 5, fill = "skyblue", color = "black", alpha = 0.7) +
-  labs(title = "Histogram of Normal Distribution",
-       x = "X values",
-       y = "Frequency")
-
-# Plot PDF of normal distribution with quantile lines
-p2 <- ggplot(df, aes(x, y)) +  
-  geom_line() + 
-  geom_vline(xintercept = c(mean, l.q, u.q), color = c("red", "blue", "blue"), linetype = "dashed") + 
-  labs(title = "Probability Density Function",
-       x = "x",
-       y = "PDF(x)")
-
-# Arrange plots side by side
-grid.arrange(p1, p2, ncol = 2)
-
 
 
 
