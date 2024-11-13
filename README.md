@@ -148,6 +148,12 @@ population.list <- list(
 # Function to simulate Central Limit Theorem
 clt.sim <- function(population.list, iter = 1000, sample.N = 100) {
   par(mfrow = c(length(population.list), 2))
+
+
+ # population.list=population.list
+ # iter = 1000
+ # sample.N = 100
+
   
   for (k in names(population.list)) {
     hist(population.list[[k]], main = k, xlab = "x")
