@@ -683,7 +683,11 @@ cat("Test Set AUC:", test_auc, "\n")
 #######################################################
 
 # Access expression data from TCGA liver cancer
-LC_NT_RClass
+data("LC_NT_RClass.rda")
+data("pathwayDB_KEGG_202411_RClass.rda")
+
+str(LC_NT_RClass)
+str(pathwayDB_KEGG_202411_RClass)
 
 # Create a gene list ordered by expression level in descending order
 geneList = LC_NT_RClass$expr[order(LC_NT_RClass$expr[,1], decreasing = T), 1]
