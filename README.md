@@ -224,7 +224,7 @@ U_test <- function(x, y, alternative = "two.sided") {
   U <- min(U_x, U_y)
   
   # Calculate the mean and standard deviation of U under the null hypothesis
-  mean_U  <- (n_x * n_y)/2   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
+  mean_U  <- (n_x * n_y)/2   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
   sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
   
   # Calculate p-value based on test alternative
@@ -282,7 +282,6 @@ for (i in 1:n_permutations) {
 }
 
 # Calculate p-value
-p_value <- mean(abs(perm_diffs) >= abs(obs_diff))
 p_value   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
 
 
@@ -415,7 +414,7 @@ if (any(tied %in% c("average", "max"))) {
 sorted <- apply(x, 2, sort)
 
 # Calculate row-wise means
-sorted.row.mean <-     # ----------------------------------------------------------------------------- Q3
+sorted.row.mean <-     # ----------------------------------------------------------------- Q4
 
 # Apply the rank-based transformation
 x2 <- apply(rank, 2, function(x) sorted.row.mean[x])
@@ -532,7 +531,7 @@ calculate_auc <- function(true_labels, probabilities) {
   rank_sum_pos <- sum(pos_ranks)
   
   # Calculate the U statistic for rank-sum
-  u_statistic <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q4
+  u_statistic <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
   
   # Calculate AUC
   auc <- u_statistic / (length(pos_ranks) * neg_count)
@@ -566,7 +565,7 @@ FP <- confusion_matrix[2, 1]  # False Positives
 FN <- confusion_matrix[1, 2]  # False Negatives
 
 # Calculate performance metrics
-precision <-            # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
+precision <-            # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
 accuracy <- 
 recall <-            
 specificity <-      
@@ -607,7 +606,7 @@ true_labels <- data$smoke  # Actual values of the response variable
 confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
 print(confusion_matrix)
 
-auc_value <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
+auc_value <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q7
 print(paste("AUC:", auc_value))
 
 
