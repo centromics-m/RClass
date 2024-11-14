@@ -416,7 +416,7 @@ if (any(tied %in% c("average", "max"))) {
 sorted <- apply(x, 2, sort)
 
 # Calculate row-wise means
-sorted.row.mean <- apply(sorted, 1, mean)
+sorted.row.mean <-     # ----------------------------------------------------------------------------- Q3
 
 # Apply the rank-based transformation
 x2 <- apply(rank, 2, function(x) sorted.row.mean[x])
