@@ -281,7 +281,8 @@ for (i in 1:n_permutations) {
   perm_diffs[i] <- mean(combined[1:20]) - mean(combined[21:40])  # Calculate mean difference
 }
 
-# Calculate p-value 
+# Calculate p-value
+p_value <- mean(abs(perm_diffs) >= abs(obs_diff))
 p_value   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
 
 
@@ -532,6 +533,7 @@ calculate_auc <- function(true_labels, probabilities) {
   rank_sum_pos <- sum(pos_ranks)
   
   # Calculate the U statistic for rank-sum
+  u_statistic <- rank_sum_pos - (length(pos_ranks) * (length(pos_ranks) + 1)) / 2
   u_statistic <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q4
   
   # Calculate AUC
@@ -561,16 +563,17 @@ print(confusion_matrix)
 
 # Extract values from confusion matrix
 TP <- confusion_matrix[2, 2]  # True Positives
-TN <-     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
-FP <- 
-FN <- 
+TN <- confusion_matrix[1, 1]  # True Negatives
+FP <- confusion_matrix[2, 1]  # False Positives
+FN <- confusion_matrix[1, 2]  # False Negatives
 
 # Calculate performance metrics
-precision <- 
-accuracy <- 
-recall <- 
-specificity <- 
-false_discovery_rate <- 
+precision <- TP / (TP + FP)
+accuracy <- (TP + TN) / (TP + TN + FP + FN)
+recall <- TP / (TP + FN)            # Sensitivity or True Positive Rate
+specificity <- TN / (TN + FP)       # True Negative Rate
+false_discovery_rate <- FP / (TP + FP)
+
 
 
 
@@ -606,8 +609,8 @@ true_labels <- data$smoke  # Actual values of the response variable
 confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
 print(confusion_matrix)
 
-auc_value <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
-
+auc_value <- calculate_auc(data$smoke, predicted_probs)  # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
+print(paste("AUC:", auc_value))
 
 
 
