@@ -533,7 +533,6 @@ calculate_auc <- function(true_labels, probabilities) {
   rank_sum_pos <- sum(pos_ranks)
   
   # Calculate the U statistic for rank-sum
-  u_statistic <- rank_sum_pos - (length(pos_ranks) * (length(pos_ranks) + 1)) / 2
   u_statistic <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q4
   
   # Calculate AUC
@@ -568,11 +567,11 @@ FP <- confusion_matrix[2, 1]  # False Positives
 FN <- confusion_matrix[1, 2]  # False Negatives
 
 # Calculate performance metrics
-precision <- TP / (TP + FP)
-accuracy <- (TP + TN) / (TP + TN + FP + FN)
-recall <- TP / (TP + FN)            # Sensitivity or True Positive Rate
-specificity <- TN / (TN + FP)       # True Negative Rate
-false_discovery_rate <- FP / (TP + FP)
+precision <-            # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
+accuracy <- 
+recall <-            
+specificity <-      
+false_discovery_rate <-   
 
 
 
@@ -609,7 +608,7 @@ true_labels <- data$smoke  # Actual values of the response variable
 confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
 print(confusion_matrix)
 
-auc_value <- calculate_auc(data$smoke, predicted_probs)  # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
+auc_value <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
 print(paste("AUC:", auc_value))
 
 
