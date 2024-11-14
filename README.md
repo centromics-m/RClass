@@ -52,7 +52,7 @@ devtools::install_github("centromics-m/RClass2024")
 
 ``` r
 options(stringsAsFactors = FALSE) 
-getwd(); setwd()
+getwd(); # setwd()
 
 pkgs = c("BiocManager", "MASS", "preprocessCore", "ggplot2", "gridExtra", "ggplotify", "pheatmap", "factoextra", "shiny", "glmnet", "reshape" )
 bioc_pkgs = c("limma", "clusterProfiler", "enrichplot")
