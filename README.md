@@ -342,7 +342,6 @@ p <- prcomp(matrix(rnorm(100), 5))  # Sample data for demonstration
 plot(p$rotation)  # Plot rotation matrix
 plot(p$x)  # Plot principal components
 biplot(p, scale = FALSE)  # Biplot
-prcomp(matrix(rnorm(100), 20))  # Demonstrates PCA with scale option explained
 
 # Loading necessary library
 require("factoextra")
