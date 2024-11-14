@@ -679,12 +679,13 @@ cat("Test Set AUC:", test_auc, "\n")
 # 9. Gene Set Enrichment Analysis
 #######################################################
 
-# Access expression data from TCGA liver cancer
-data("LC_NT_RClass.rda")
-data("pathwayDB_KEGG_202411_RClass.rda")
+if (!require("BiocManager", quietly = TRUE))
+BiocManager::install("clusterProfiler")
+BiocManager::install("enrichplot")
 
-str(LC_NT_RClass)
-str(pathwayDB_KEGG_202411_RClass)
+load("LC_NT_RClass,rda")
+load("pathwayDB_KEGG_202411_RClass.rda")
+
 
 # Create a gene list ordered by expression level in descending order
 geneList = LC_NT_RClass$expr[order(LC_NT_RClass$expr[,1], decreasing = T), 1]
