@@ -683,8 +683,9 @@ if (!require("BiocManager", quietly = TRUE))
 BiocManager::install("clusterProfiler")
 BiocManager::install("enrichplot")
 
-load("LC_NT_RClass,rda")
-load("pathwayDB_KEGG_202411_RClass.rda")
+
+# load("LC_NT_RClass.rda")
+# load("pathwayDB_KEGG_202411_RClass.rda")
 
 
 # Create a gene list ordered by expression level in descending order
