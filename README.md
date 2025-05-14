@@ -16,7 +16,7 @@ output:
 This page provides the supplementary R code and data to reproduce the experiments in the following paper : **Accurate prediction of acquired EGFR TKIs resistance using a pathway-based individualized machine learning approach**  
 -->
 
-## RClass2024
+## RClass2025
 
 **Main Dataset**
 ----------------
@@ -48,7 +48,7 @@ devtools::install_github("centromics-m/RClass2024")
 
 ------------------------------------------------------------------------
 
-## 20241112
+## 202505
 
 ``` r
 options(stringsAsFactors = FALSE) 
