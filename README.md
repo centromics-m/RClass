@@ -205,7 +205,7 @@ for (i in 1:n_permutations) {
 hist(perm_diffs)
 abline(v=abs(obs_diff))
 # Calculate p-value
-p_value <- mean(abs(perm_diffs) >= abs(obs_diff))   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
+p_value <-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
 p_value
 
 
