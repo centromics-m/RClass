@@ -63,29 +63,150 @@ install_if_missing(pkgs, bioc_pkgs)
 RClass:::install_if_missing(pkgs, bioc_pkgs)
 
 
+
 ####################################################### 
-# 1. Normal Distribution 
+# 1-1. Sample, Quantile & Scale
 ####################################################### 
 
-# Uniform distribution (ontinuous & discrete)
-continuous_uniform <- runif(10, min = 0, max = 1) 
-discrete_uniform <- sample(1:10, size = 10, replace = T) 
 
-# Normal distribution
-# Set parameters for the normal distribution
-n=100; mean = 0; sd = 1
-n=1000; mean = 100; sd = 10
+# Set seed for reproducible results
+set.seed(123)
 
-# Generate data
-x <- rnorm(n = n, mean = mean, sd = sd)
-hist_data <- hist(x)
+# Simulating large populations based on birth year and sex
+# Generate male 1995 population from a normal distribution (mean 1.1, SD 0.1)
+population.male.1995 = rnorm(500000/2, 1.1, 0.1) # Generates 250,000 values
+# Generate female 1995 population from a normal distribution (mean 0.9, SD 0.1)
+population.female.1995 = rnorm(500000/2, 0.9, 0.1) # Generates 250,000 values
 
-# Probability density function (PDF) values
-y <- dnorm(x, mean = mean, sd = sd)
+# Generate male 1971 population from a normal distribution (mean 1.05, SD 0.2)
+population.male.1971 = rnorm(1000000/2, 1.05, 0.2) # Generates 500,000 values
+# Generate female 1971 population from a normal distribution (mean 0.85, SD 0.2)
+population.female.1971 = rnorm(1000000/2, 0.85, 0.2) # Generates 500,000 values
 
-# Quantile function values
-u.q <- qnorm(0.975, mean = mean, sd = sd) # Upper 2.5% quantile
-l.q <- qnorm(0.025, mean = mean, sd = sd) # Lower 2.5% quantile
+
+# Draw 1000 samples from the simulated populations
+sample.male.1971 <- sample(population.male.1971, 1000)
+sample.female.1971 <- sample(population.female.1971, 1000)
+
+
+
+# Task 1: Understanding data characteristics using osteoporosis simulation data 
+# 1. Boxplot
+boxplot(sample.male.1971, horizontal = T)
+
+# Code to calculate IQR:
+q1 <- quantile(sample.male.1971, 0.25) # First Quartile (Q1)
+q3 <- quantile(sample.male.1971, 0.75) # Third Quartile (Q3)
+iqr <- q3 - q1
+
+# Maximum/minimum boundaries for whiskers (Q1 - 1.5*IQR, Q3 + 1.5*IQR)
+lower_limit <- q1 - 1.5 * iqr
+upper_limit <- q3 + 1.5 * iqr
+
+
+# 2. SE = sample standard deviation / sqrt(sample size)
+# (Using Z-distribution for CI since sample is large enough - common approximation)
+hist(sample.male.1971)
+x_bar = mean(sample.male.1971)
+abline(v=x_bar, col=2) # Add line for sample mean
+se <- sd(sample.male.1971)/ sqrt(length(sample.male.1971)); se # Calculate Standard Error (SE)
+
+
+# 3. Calculate 95% Confidence Interval for the mean (Using Z-distribution critical value as sample is large enough)
+alpha = 0.05; # Significance level (1 - confidence level)
+z_critical = qnorm(1 - alpha/2) # Same as qnorm(0.975), 95% confidence level two-tailed critical value (approx. 1.96)
+
+lCI=mean(sample.male.1971)-z_critical * se # Lower CI
+uCI=mean(sample.male.1971)+z_critical * se # Upper CI
+
+abline(v=lCI, lty=2, col=3) # Add line for Lower CI bound
+abline(v=uCI, lty=2, col=3) # Add line for Upper CI bound
+
+
+
+
+# 2-1  --- Simulation to demonstrate SE ---
+# Simulated SE
+sample_n_sim <- 100 # Size of each sample for simulation (e.g., drawing 100 people)
+num_simulations <- 10000 # Number of times to draw samples and calculate the mean (e.g., repeating 10,000 times)
+sample_means <- c()
+for (i in 1:num_simulations) {
+  sample_data <- sample(population.male.1971, sample_n_sim) # Note: Using sample_n_sim
+  sample_means[i] <- mean(sample_data)
+}
+simulated_se <- sd(sample_means); 
+simulated_se 
+
+hist(sample_means)
+abline(v = mean(population.male.1971), col = "red", lty = 2) 
+
+
+# SE value calculated using one sample's standard deviation.
+one_sample <- sample(population.male.1971, sample_n_sim) # Note: Using sample_n_sim
+estimated_se <- sd(one_sample) / sqrt(sample_n_sim)
+estimated_se
+
+# 'Theoretical' SE value calculated using population standard deviation (most accurate)
+# Typo fix: sample.male.male.1971 - This seems to be an old comment line
+theoretical_se <- sd(population.male.1971) / sqrt(sample_n_sim) 
+theoretical_se
+
+
+
+# --- Standardization and T-score Calculations ---
+
+# Standardize the male 1995 population (Z-transformation) and show first 10 values
+((population.male.1995-mean(population.male.1995))/sd(population.male.1995))[1:10]
+scale(population.male.1995)[1:10]
+
+# Calculate T-scores for the male 1971 sample using the 1995 male population as reference
+male.1971.tscores = (sample.male.1971-mean(population.male.1995))/sd(population.male.1995)
+
+# Plot histogram of the standardized male 1995 population
+hist(scale(population.male.1995))
+# Add a line for the mean T-score of the male 1971 sample relative to 1995 male population reference
+abline(v=mean(male.1971.tscores), col=2)
+
+# Calculate T-scores for the female 1971 sample using the 1995 female population as reference
+female.1971.tscores = (sample.female.1971-mean(population.female.1995))/sd(population.female.1995)
+
+# Add a line for the mean T-score of the female 1971 sample relative to 1995 female population reference
+# Note: This line is plotted on the histogram of the *standardized male 1995 population*, which might be confusing visually.
+abline(v=mean(female.1971.tscores), col=3)
+
+
+
+
+####################################################### 
+# 1-2. Permutation test 
+####################################################### 
+
+# Task 2: Performing hypothesis testing using permutation test 
+# Generate sample data
+# set.seed(123)  # Set seed for reproducibility
+# group_A <- rnorm(20, mean = 5, sd = 1)
+# group_B <- rnorm(20, mean = 6, sd = 1)
+group_A <- male.1971.tscores
+group_B <- female.1971.tscores
+
+# Calculate observed mean difference
+obs_diff <- mean(group_A) - mean(group_B)
+
+# Set up permutation t-test
+n_permutations <- 9999  # Number of permutations
+perm_diffs <- numeric(n_permutations)  # Vector to store permutation differences
+
+# Perform permutations
+for (i in 1:n_permutations) {
+  combined <- sample(c(group_A, group_B))  # Shuffle combined data
+  perm_diffs[i] <- mean(combined[1:length(group_A)]) - mean(combined[(length(group_A)+1):length(combined)  ]) # Calculate mean difference
+}
+
+hist(perm_diffs)
+abline(v=abs(obs_diff))
+# Calculate p-value
+p_value <- mean(abs(perm_diffs) >= abs(obs_diff))   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
+p_value
 
 
 
@@ -95,6 +216,7 @@ l.q <- qnorm(0.025, mean = mean, sd = sd) # Lower 2.5% quantile
 # 2. Standard Error & Central Limit Theorem Simulation 
 ####################################################### 
 
+# Task 3: Understanding CLT
 # Generate population data for different distributions
 n <- 1000
 population.list <- list(
@@ -160,560 +282,6 @@ server <- function(input, output) {
 
 # Launch the Shiny App
 shinyApp(ui, server)
-
-
-
-
-
-####################################################### 
-# 3. Chi-square test
-####################################################### 
-
-# Observed frequency matrix
-observed <- matrix(c(30, 70, 50, 150), 2)
-rownames(observed) <- c("Male", "Female")
-colnames(observed) <- c("Smoke", "Non-smoke")
-observed
-
-# Calculate row sums, column sums, and total sum
-row_sums <- rowSums(observed)
-col_sums <- colSums(observed)
-total_sum <- sum(observed)
-
-# Create expected frequency matrix
-expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
-
-# Calculate expected frequencies using a for loop
-for (i in 1:nrow(observed)) {
-  for (j in 1:ncol(observed)) {
-    expected[i, j] <- (row_sums[i] * col_sums[j]) / total_sum
-  }
-}  
-expected   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
-
-# Calculate Chi-squared statistic
-chi_squared <- sum((observed - expected)^2 / expected)
-print(paste("Chi-squared statistic:", chi_squared))
-
-# Calculate degrees of freedom
-df <- (nrow(observed) - 1) * (ncol(observed) - 1)
-print(paste("Degrees of freedom:", df))
-
-# Calculate p-value
-p_value <- 1 - pchisq(chi_squared, df)
-print(paste("p-value:", p_value))
-
-
-
-
-
-####################################################### 
-# 4. U test
-####################################################### 
-
-U_test <- function(x, y, alternative = "two.sided") {
-  n_x <- length(x)
-  n_y <- length(y)
-  
-  # Calculate ranks for combined data and U statistic for Group x
-  rank_data <- rank(c(x, y))
-  U_x <- sum(rank_data[1:n_x]) - (n_x * (n_x + 1)) / 2
-  
-  # Calculate U statistic for Group y and select the minimum U
-  U_y <- n_x * n_y - U_x
-  U <- min(U_x, U_y)
-  
-  # Calculate the mean and standard deviation of U under the null hypothesis
-  mean_U  <- (n_x * n_y)/2   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
-  sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
-  
-  # Calculate p-value based on test alternative
-  z <- (U - mean_U) / sd_U
-  if (alternative == "two.sided") {
-    p_value <- 2 * pnorm(-abs(z))  
-  } else if (alternative == "greater") {
-    p_value <- pnorm(-z)
-  } else if (alternative == "less") {
-    p_value <- pnorm(z)
-  } else {
-    stop("alternative must be 'two.sided', 'greater', or 'less'")
-  }
-  
-  return(p_value)
-}
-
-# Test the function with example data
-x <- c(1, 2, 3, 4)
-y <- c(5, 6, 7, 8)
-U_test(x, y, alternative = "two.sided")
-U_test(x, y, alternative = "greater")
-U_test(x, y, alternative = "less")
-
-# Comparison with R's Base Functions
-getS3method("wilcox.test", "default")
-wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "two.sided")
-wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "greater")
-wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "less")
-
-
-
-
-
-####################################################### 
-# 5-1. Permutation t-test 
-####################################################### 
-
-# Generate sample data
-set.seed(123)  # Set seed for reproducibility
-group_A <- rnorm(20, mean = 5, sd = 1)
-group_B <- rnorm(20, mean = 6, sd = 1)
-
-# Calculate observed mean difference
-obs_diff <- mean(group_A) - mean(group_B)
-
-# Set up permutation t-test
-n_permutations <- 9999  # Number of permutations
-perm_diffs <- numeric(n_permutations)  # Vector to store permutation differences
-
-# Perform permutations
-for (i in 1:n_permutations) {
-  combined <- sample(c(group_A, group_B))  # Shuffle combined data
-  perm_diffs[i] <- mean(combined[1:20]) - mean(combined[21:40])  # Calculate mean difference
-}
-
-# Calculate p-value
-p_value   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
-
-
-
-
-
-
-####################################################### 
-# 5-2. geneSetTest example using limma-like logic
-####################################################### 
-
-# Testing whether a subset of gene statistics is higher than expected by chance
-
-# Generate example data
-statistics <- rnorm(100)  # All gene statistics
-index <- 1:10  # Indices for the gene set
-statistics[index] <- statistics[index] + 1  # Modify gene set statistics for testing
-alternative <- "mixed"  # Testing alternative hypothesis
-nsim <- 9999  # Number of simulations
-
-# Extract and filter the subset of statistics
-ssel <- statistics[index]
-ssel <- ssel[!is.na(ssel)]
-nsel <- length(ssel)
-if (nsel == 0) return(1)  # If no selected statistics, return p-value of 1
-
-# Set up statistic and function for alternatives
-stat <- statistics[!is.na(statistics)]
-msel <- mean(ssel)
-if (alternative == "either") { 
-  posstat <- abs 
-} else { 
-  posstat <- function(x) x 
-}
-msel <- posstat(msel)
-
-# Simulation to compute p-value
-ntail <- 1
-for (i in 1:nsim) {
-  if (posstat(mean(sample(stat, nsel))) >= msel) {
-    ntail <- ntail + 1
-  }
-}
-p.value <- ntail / (nsim + 1)
-p.value
-
-
-
-
-
-####################################################### 
-# 6. PCA Analysis and Visualizatio
-####################################################### 
-
-# Basic PCA Example
-p <- prcomp(matrix(rnorm(100), 5))  # Sample data for demonstration
-plot(p$rotation)  # Plot rotation matrix
-plot(p$x)  # Plot principal components
-biplot(p, scale = FALSE)  # Biplot
-
-# Loading necessary library
-require("factoextra")
-
-# Custom dataset creation and PCA
-x <- t(makeSimData2(25, 50)$exp)  # Transposed data for PCA
-group.col.N <- NULL
-scale <- FALSE
-addEllipses <- FALSE
-gradient.cols <- c("#00AFBB", "#E7B800", "#FC4E07")  # Color scheme for plots
-
-# Run PCA
-pca <- prcomp(x, scale = scale)  # Set scale = TRUE for standardization if variables have different units
-summary(pca)
-print(pca$rotation)
-
-# Eigenvalue Visualization
-p1 <- fviz_eig(pca)  # Show % of variances explained by each PC
-print(p1)
-
-# Define color by groups or quality of representation (cos2)
-if (!is.null(group.col.N) && is.numeric(group.col.N)) {
-  groups <- as.factor(x[[group.col.N]])
-  col.ind <- groups
-} else {
-  col.ind <- "cos2"
-}
-
-# Set label options based on data size
-label.ind <- if (dim(x)[1] > 30) "none" else "all"
-label.var <- if (dim(x)[2] > 30) "none" else "all"
-label.bi <- if (dim(x)[1] > 30 || dim(x)[2] > 30) "none" else "all"
-
-# Sample Plot
-p2 <- fviz_pca_ind(pca, col.ind = col.ind, gradient.cols = gradient.cols, 
-                   repel = TRUE, addEllipses = addEllipses, label = label.ind)
-print(p2)
-
-# Variable Plot
-p3 <- fviz_pca_var(pca, col.var = "contrib", gradient.cols = gradient.cols, 
-                   repel = TRUE, label = label.var)
-print(p3)
-
-
-
-
-
-
-####################################################### 
-# 7-1. Scale and Quantile Normalization 
-#######################################################
-
-# Quantile Normalization
-
-# Sample data matrix
-x <- data.frame(matrix(sample(12, replace = TRUE), 4))
-
-# Parameters
-tied <- "average"  # Options: "average", "max", etc.
-verbose <- TRUE
-
-# Rank the data
-rank <- apply(x, 2, rank, ties.method = "min")
-
-# If necessary, apply max method for ties
-if (any(tied %in% c("average", "max"))) {
-  rank.max <- apply(x, 2, rank, ties.method = "max")
-}
-
-# Sort the data
-sorted <- apply(x, 2, sort)
-
-# Calculate row-wise means
-sorted.row.mean <-     # ----------------------------------------------------------------- Q4
-
-# Apply the rank-based transformation
-x2 <- apply(rank, 2, function(x) sorted.row.mean[x])
-
-# If using max for ties, apply it
-if (any(tied %in% c("average", "max"))) {
-  x2.max <- apply(rank.max, 2, function(x) sorted.row.mean[x])
-}
-
-# Combine results depending on the chosen tie-breaking method
-if (tied == "average") {
-  x2 <- (x2 + x2.max) / 2
-} else if (tied == "max") {
-  x2 <- x2.max
-}
-
-# Convert back to data frame or matrix if needed
-if (any(class(x) == "data.frame")) {
-  x2 <- as.data.frame(x2)
-  rownames(x2) <- rownames(x)
-} else if (any(class(x) == "matrix")) {
-  x2 <- as.matrix(x2)
-  rownames(x2) <- rownames(x)
-}
-
-# If verbose output is enabled, show intermediate steps
-if (verbose) {
-  op <- par(no.readonly = TRUE)
-  par(mfrow = c(1, 2), mar = c(3, 3, 1, 1))
-  
-  cat('Original matrix or data.frame\n')
-  peep(x, TRUE)
-  cat('Sort the original matrix from lowest to highest\n')
-  peep(rank)
-  cat('Determine the ranks of original matrix\n')
-  peep(sorted)
-  cat('\nCalculate the means\n\n')
-  peep(sorted.row.mean)
-  cat('\n\nFinally substitute the means into our ranked matrix\n')
-  peep(x2, TRUE)
-  cat(sprintf('If the values were tied, %s is used\n\n', tied))
-  
-  par(op)
-}
-
-# Final output
-x2
-
-
-
-
-####################################################### 
-# 7-2. Scale and normalization for different techniques
-#######################################################
-
-sim <- makeSimData2(25, 50)
-sim <- makeSimData2(25, 50, seed = 15, technique = "rna_seq_counts")
-sim <- makeSimData2(25, 50, seed = 15, technique = "sc_rna_seq_counts")
-
-# Heatmap of the expression data
-pheatmap(sim$exp, cluster_rows = FALSE, cluster_cols = FALSE)
-
-# Extract expression data
-x <- sim$exp
-
-# Perform different normalization techniques
-q <- normalize.quantiles(as.matrix(x))  # Quantile normalization
-xx <- list(
-  x = x, 
-  l = log2(x),  # Log transformation
-  q = q,        # Quantile normalized data
-  z = scale(x),  # Z-score normalization
-  tzt = t(scale(t(x))),  # Transpose, scale and then transpose back
-  qz = scale(q),  # Z-score normalization of quantile normalized data
-  gz = (x - mean(x)) / sd(x),  # Alternative Z-score normalization
-  ql = log2(q),  # Log transformation after quantile normalization
-  qltzt = t(scale(t(log2(q))))  # Transpose, log transform, scale and transpose back
-)
-
-# Boxplot visualization of the normalized data
-par(mfrow = c(2, 4), mar = c(3, 4, 2, 1))
-for (xxx in names(xx)) { 
-  boxplot(xx[[xxx]], main = xxx) 
-}
-
-# Create heatmaps for each normalization method
-a <- list()
-for (i in names(xx)) {
-  a[[i]] <- as.ggplot(pheatmap(xx[[i]], main = i, cluster_rows = FALSE, cluster_cols = FALSE, show_rownames = FALSE, show_colnames = FALSE))
-}
-
-# Arrange heatmaps in a grid
-gridExtra::grid.arrange(grobs = a)
-
-
-
-
-
-####################################################### 
-# 8. AUC & Confusion_matrix
-#######################################################
-
-calculate_auc <- function(true_labels, probabilities) {
-  # Calculate the ranks of the probabilities (lower values have lower ranks)
-  ranks <- rank(probabilities)
-  
-  # Get the ranks of the positive class instances
-  pos_ranks <- ranks[true_labels == 1]
-  
-  # Count the number of negative class instances
-  neg_count <- sum(true_labels == 0)
-  
-  # Calculate the sum of ranks for the positive class
-  rank_sum_pos <- sum(pos_ranks)
-  
-  # Calculate the U statistic for rank-sum
-  u_statistic <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
-  
-  # Calculate AUC
-  auc <- u_statistic / (length(pos_ranks) * neg_count)
-  return(auc)
-}
-
-
-true_labels <- c(1, 0, 1, 0, 1, 0, 1, 0)
-probabilities <- c(0.9, 0.4, 0.8, 0.3, 0.6, 0.2, 0.7, 0.1)
-# probabilities <- c(0.51, 0.49, 0.51, 0.49, 0.51, 0.49, 0.51, 0.49)
-# probabilities <- c(0.51, 0.49, 0.51, 0.49, 0.51, 0.49, 0.51, 0.6)
-
-# Calculate AUC
-auc_value <- calculate_auc(true_labels, probabilities)
-cat("AUC:", auc_value, "\n")
-
-# Confusion matrix based on a threshold (0.5 in this case)
-threshold <- 0.5
-predictions <- ifelse(probabilities >= threshold, 1, 0)
-
-# Create confusion matrix
-confusion_matrix <- table(Predicted = predictions, Actual = true_labels)
-print("Confusion Matrix:")
-print(confusion_matrix)
-
-
-# Extract values from confusion matrix
-TP <- confusion_matrix[2, 2]  # True Positives
-TN <- confusion_matrix[1, 1]  # True Negatives
-FP <- confusion_matrix[2, 1]  # False Positives
-FN <- confusion_matrix[1, 2]  # False Negatives
-
-# Calculate performance metrics
-precision <-            # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
-accuracy <- 
-recall <-            
-specificity <-      
-false_discovery_rate <-   
-
-
-
-
-
-
-####################################################### 
-# 8. Logistic regression
-#######################################################
-# Sample data
-data <- data.frame(
-  smoke = c(0, 1, 0, 1, 0, 1, 0, 0, 1, 1),    # Binary outcome (smoking or not)
-  age = c(22, 45, 30, 50, 27, 37, 26, 34, 48, 29), # Predictor variable: age
-  income = c(3, 2, 4, 1, 4, 3, 3, 4, 1, 2)   # Predictor variable: income level (1 = low, 5 = high)
-); data 
-
-# Fit binomial logistic regression model
-model <- glm(smoke ~ age + income, family = binomial(link = "logit"), data = data)
-
-# View model summary
-summary(model)
-
-# Predict probabilities of smoking
-# This will output the predicted probabilities (from 0 to 1) for each individual in the dataset. These probabilities indicate the likelihood of each individual being a smoker based on their age and income.
-predicted_probs <- predict(model, type = "response")
-print(predicted_probs)
-
-# Convert probabilities to binary predictions with a 0.5 threshold
-predicted_labels <- ifelse(predicted_probs > 0.5, 1, 0)
-print(predicted_labels)
-
-# Create the confusion matrix
-true_labels <- data$smoke  # Actual values of the response variable
-confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
-print(confusion_matrix)
-
-auc_value <-   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q7
-print(paste("AUC:", auc_value))
-
-
-
-
-
-####################################################### 
-# 8. Logistic regression - 10 fold CV
-#######################################################
-
-# Set up random seed for reproducibility
-set.seed(123)
-
-# Generate sample data
-n <- 200
-data <- data.frame(
-  x1 = rnorm(n),             # Predictor variable 1 (normally distributed)
-  x2 = rnorm(n),             # Predictor variable 2 (normally distributed)
-  y = rbinom(n, 1, prob = 0.5)  # Binary outcome variable (0 or 1) with a 50% probability
-)
-
-# Split data into training and test sets (70% training, 30% test)
-train_index <- sample(1:n, size = 0.7 * n, replace = FALSE)  # Randomly select indices for training set
-train_data <- data[train_index, ]  # Training data subset
-test_data <- data[-train_index, ]  # Test data subset
-
-# Set up 10-fold cross-validation
-k <- 10
-folds <- sample(rep(1:k, length.out = nrow(train_data)))  # Randomly assign each row to one of the 10 folds
-
-# Initialize vector to store AUC values from each fold
-cv_auc <- c()
-
-# Perform cross-validation to evaluate AUC
-for (i in 1:k) {
-  # Divide training data into fold-specific training and validation sets
-  fold_train <- train_data[folds != i, ]  # Data for training on this fold
-  fold_val <- train_data[folds == i, ]    # Data for validation on this fold
-  
-  # Fit logistic regression model on fold training data
-  model <- glm(y ~ x1 + x2, data = fold_train, family = "binomial")
-  
-  # Predict probabilities on fold validation data
-  pred_probs <- predict(model, newdata = fold_val, type = "response")
-  
-  # Calculate AUC for this fold using U-statistic
-  fold_auc <- calculate_auc(fold_val$y, pred_probs)
-  cv_auc <- c(cv_auc, fold_auc)  # Store AUC for this fold
-}
-
-# Print mean AUC from 10-fold cross-validation
-cat("10-Fold Cross-Validation AUC:", mean(cv_auc), "\n")
-
-# Train the final model on the entire training set
-final_model <- glm(y ~ x1 + x2, data = train_data, family = "binomial")
-
-# Predict probabilities on the test set
-test_probs <- predict(final_model, newdata = test_data, type = "response")
-
-# Calculate and print AUC for test set
-test_auc <- calculate_auc(test_data$y, test_probs)
-cat("Test Set AUC:", test_auc, "\n")
-
-
-
-
-
-
-####################################################### 
-# 9. Gene Set Enrichment Analysis
-#######################################################
-
-if (!require("BiocManager", quietly = TRUE))
-BiocManager::install("clusterProfiler")
-BiocManager::install("enrichplot")
-
-
-# load("LC_NT_RClass.rda")
-# load("pathwayDB_KEGG_202411_RClass.rda")
-
-
-# Create a gene list ordered by expression level in descending order
-geneList = LC_NT_RClass$expr[order(LC_NT_RClass$expr[,1], decreasing = T), 1]
-
-# Reshape the pathway database into a long format and keep specific columns
-df <- reshape::melt(pathwayDB_KEGG_202411_RClass)
-df <- df[, c(2, 1)]
-
-# Run Gene Set Enrichment Analysis (GSEA) with the gene list and pathway data
-# and calculate pairwise term similarities
-GSEA.results <- pairwise_termsim(GSEA(geneList, TERM2GENE=df))
-
-# Plot GSEA results for the top pathway
-gseaplot2(GSEA.results, GSEA.results$ID[1])
-
-# Generate various visualizations of GSEA results
-emapplot(GSEA.results)     # Enrichment map plot
-cnetplot(GSEA.results)     # Concept network plot
-heatplot(GSEA.results)     # Heatmap plot
-ridgeplot(GSEA.results)    # Ridge plot
-
-
-
-
-
-
-
 
 
 
