@@ -21,8 +21,8 @@ This page provides the supplementary R code and data to reproduce the experiment
 **Main Dataset**
 ----------------
 
--   Preprocessed dataset can be downloaded from [here](https://github.com/centromics-m/RClass2024/raw/refs/heads/main/data/LC_NT_RClass.rda)
--   The pathways used for model construction can be downloaded from [here](https://github.com/centromics-m/RClass2024/raw/refs/heads/main/data/pathwayDB_KEGG_202411_RClass.rda)
+-   Preprocessed dataset can be downloaded from [here](https://github.com/centromics-m/RClass/raw/refs/heads/main/data/LC_NT_RClass.rda)
+-   The pathways used for model construction can be downloaded from [here](https://github.com/centromics-m/RClass/raw/refs/heads/main/data/pathwayDB_KEGG_202411_RClass.rda)
 
 ------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ if (!require("devtools")) install.packages("devtools")
 To install the latest version of package via Github, run following commands in R:
 
 ``` r
-devtools::install_github("centromics-m/RClass2024")
+devtools::install_github("centromics-m/RClass")
 ```
 
 ------------------------------------------------------------------------
