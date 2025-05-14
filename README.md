@@ -99,9 +99,9 @@ q1 <- quantile(sample.male.1971, 0.25) # First Quartile (Q1)
 q3 <- quantile(sample.male.1971, 0.75) # Third Quartile (Q3)
 iqr <- q3 - q1
 
-# Maximum/minimum boundaries for whiskers (Q1 - 1.5*IQR, Q3 + 1.5*IQR)
-lower_limit <- q1 - 1.5 * iqr
-upper_limit <- q3 + 1.5 * iqr
+# Maximum/minimum boundaries for whiskers
+lower_limit <-     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
+upper_limit <- 
 
 
 # 2. SE = sample standard deviation / sqrt(sample size)
@@ -205,7 +205,7 @@ for (i in 1:n_permutations) {
 hist(perm_diffs)
 abline(v=abs(obs_diff))
 # Calculate p-value
-p_value <-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
+p_value <-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
 p_value
 
 
