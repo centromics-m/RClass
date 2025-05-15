@@ -291,7 +291,114 @@ shinyApp(ui, server)
 
 
 
-``` 
+
+# ---- 4. 데이터 타입 알아보기 ----
+
+
+# ---- 5. 연산자 알아보기 ----
+
+
+# ---- 6.데이터 구조 알아보기 ----
+
+# 6-1.벡터 (Vector)
+x <- c(1, 2, 3) # 숫자형 벡터
+y <- c(TRUE, FALSE) # 논리형 벡터
+
+# 6-2.팩터 (Factor)
+factor_1 <- factor(c("low", "high", "medium"))
+factor_1
+levels(factor_1)[1]
+
+factor_2 <- factor(c("control", "treat"))
+factor_2
+levels(factor_2)[1]
+
+factor_3 <- factor(c("male", "female"))
+levels(factor_3)
+factor_3
+levels(factor_3)[1]
+
+# 6-3.리스트 (list)
+list_1 <- list(name="yejin", gpa = 2.0, passed = FALSE)
+list_1
+
+# 6-4. 매트릭스 (Matrix)
+mat_1 <- matrix(1:6, nrow=2)
+mat_2 <- matrix(1:24, ncol=3)
+
+# 6-5. 배열 (Array)
+array_1 <- array(1:24, dim = c(2, 3, 4))
+
+# 6-6. 데이터 프레임
+df <- data.frame(name = c("yejin", "vinnuri"),
+                 gpa = c(2.0, 4.5),
+                 passed = c(FALSE, TRUE))
+
+df
+
+# ---- 7.제어문 ----
+
+x <- 10
+# if문
+if (x > 5) {
+  print("x는 5보다 크다")
+}
+
+# if ... else 문
+x <- 3
+if (x > 5) {
+  print("x는 5보다 크다")
+} else {
+  print("x는 5 이하이다")
+}
+
+# else if 문
+x <- 5
+if (x > 5) {
+  print("x는 5보다 크다")
+} else if (x == 5) {
+  print("x는 5이다")
+} else {
+  print("x는 5보다 작다")
+}
+
+# for 반복문
+for (i in 1:3) {
+  print(paste("현재 i =", i))
+}
+
+# while 반복문
+x <- 1
+while (x <= 3) {
+  print(paste("x는", x, "입니다"))
+  x <- x + 1
+}
+
+# ---- 8.함수 ----
+# 8-1. 내장함수 사용해보기
+# plot()
+x <- 1:10
+y <- x^2
+plot(x, y, main = "squre function", col = "blue", type = "b")
+
+# hist()
+data <- rnorm(100)  # 평균 0, 표준편차 1인 정규분포 샘플 100개
+hist(data, main = "histogram", col = "skyblue")
+
+# 8-2.함수만들기
+
+
+# ---- 9. 패키지 설치하기 ----
+# 9-1. 패키지 설치
+install.packages("ggplot2")
+
+# 9-2. 패키지 불러오기
+library(ggplot2)
+
+# ---- 10. 실습 ----
+
+
+
 
 
 
