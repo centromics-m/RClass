@@ -109,7 +109,7 @@ cat.box <- function(title = "CAUTION", text, type = 2) {
   if (type == 1) {
     cat(
       BOLD %+% "\n\n" %+% WHITE %+% line %+% "//\n" %+%
-        BOLD %+% paste0(" ", title) %+%
+        BOLD %+% paste0("📎 ", title) %+%
         GREY %+% "\n" %+% line %+% "\n" %+%
         YELLOW %+% ITALIC %+% paste0(" ", text) %+% RESET %+%
         WHITE %+% "\n" %+% line %+% "\\\\" %+%
@@ -120,7 +120,7 @@ cat.box <- function(title = "CAUTION", text, type = 2) {
       RED %+% BOLD %+% "\n\n\\___" %+%
         BLUE %+% BOLD %+% "___" %+%
         SILVER %+% BOLD %+% paste(rep("_", width-3), collapse = "") %+% "\n\n" %+%
-        BOLD %+% paste0(" ", title) %+%
+        BOLD %+% paste0("📎 ", title) %+%
         GREY %+% "\n" %+% line %+% "\n" %+%
         YELLOW %+% ITALIC %+% paste0(" ", text) %+%
         WHITE %+% BOLD %+% "\n" %+% paste(rep("_", width), collapse = "") %+% "\n\n\n" %+%
@@ -131,6 +131,17 @@ cat.box <- function(title = "CAUTION", text, type = 2) {
 
 
              
+
+             
+#' @export 
+addNoise <- function(x, noise = 1.5) {
+  n <- nrow(x)
+  if(noise != 0 || !is.null(noise)) x <- apply(x, 2, function(x) { x + rnorm(n, 0, noise * sd(x, na.rm=TRUE)) })  # adds noise completely at random to each variable depending on its size and standard deviation.
+}             
+             
+
+
+
              
 #' @export 
 makeSimData <- function(nGenes = 150, nSamples = 100, platform = c("microarray", "seq", "sc"), fc = 2, contrast.percentage = 0.2, noise = 1.5, seed = 1234)
@@ -141,11 +152,12 @@ makeSimData <- function(nGenes = 150, nSamples = 100, platform = c("microarray",
   group_ <- group_bulk <- group_sc <- rep(c("A", "B"), each=nSamples/2)
   
   
-  # 20% 유전자에 contrast 부여
+  # 20% contrast 
   de_genes <- sample(1:nGenes, nGenes * contrast.percentage)
   fc <- fc  # fold change
   
-  if(platform == "microarray") {   # 1. 마이크로어레이 (log-scale, continuous)
+  if(platform == "microarray") {   
+    # 1.log-scale, continuous
     microarray <- matrix(rnorm(nGenes * nSamples, mean=6, sd=1), nGenes, nSamples)
     # contrast 적용
     microarray[de_genes, group_bulk == "B"] <- microarray[de_genes, group_bulk == "B"] + log2(fc)
@@ -243,64 +255,207 @@ normalize.q <- function(x= data.frame(matrix(sample(12, replace = T), 4)), filte
 
 
 #' @export 
-DEGs <- function(Exp, cl, adj.pval = 0.1,  logFC = 2, geomTextN=5, heatmapUpN = 25, plotDEG =T, multipleRegression=F, rowCounts=F, meanFilter=10, PDF=T, cname='temp', show_column_names=T, rect_gp = gpar(col = NA, lty = 1, lwd = 0.2)) {
-  try(dev.off(), silent = T)
+DEGs <- function(Exp,
+                 cl,
+                 adj.pval = 0.1,
+                 logFC = 2,
+                 geomTextN = 5,
+                 heatmapUpN = 25,
+                 plotDEG = T,
+                 rowCounts = F,
+                 meanFilter = 5,
+                 PDF = F,
+                 cname = 'temp',
+                 show_column_names = T,
+                 rect_gp = gpar(col = NA, lty = 1, lwd = 0.2),
+                 install.pkgs = F) {
+  # try(dev.off(), silent = T)
+  check_and_load_packages(c('ggplot2', 'ggrepel', 'limma', 'edgeR', 'ComplexHeatmap'))
   
-  install_if_missing(c('ggplot2', 'ggrepel'), c('limma', 'ComplexHeatmap'))
+  if (install.pkgs) {
+    # Install required packages
+    is.installed(c('ggplot2', 'ggrepel'))
+    is.installed.bioconductor(c('limma', 'edgeR', 'ComplexHeatmap'))
+  }
   
-  if(rowCounts) { Exp <- Exp[apply(Exp, 1, mean) > meanFilter, ]; Exp <- voom(Exp, plot = T) }
+  if (!is.matrix(Exp)) {
+    cat.box(
+      "This function requires a matrix input. Use as.matrix() to convert your data if needed."
+    )
+    return(invisible(NULL))
+  }
   
-  if(multipleRegression) { fit <-eBayes(lmFit(Exp, model.matrix(~ .,cl))); print(topTable(fit, 2))                                     } else {
-    fit <-eBayes(lmFit(Exp, model.matrix(~ .,cl[, 1, drop=F]))); print(topTable(fit, 2)) } 
+  if (is.vector(cl)) {
+    cl <- as.data.frame(var = cl)
+  }
   
-  tT <- topTable(fit, number = dim(Exp)[1])
-  tT$Gene <- rownames(tT)
-  tT.up <- tT[order(tT$logFC, decreasing = T ),]; tT.down<- tT[order(tT$logFC),]
-  tT.filter <- data.frame(tT[inx<-(tT$adj.P.Val<adj.pval) & (abs(tT$logFC) > logFC ), ]); print(tT.filter)
   
-  if(PDF) {
-    pdf(file = file.path(getwd(),sprintf("%s.pdf", cname )), width=5, height=5)  }
-  if(plotDEG) {
-    if(rowCounts) Exp <- Exp$E
-    
-    if(any(colnames(tT) == "logFC" && dim(tT.filter)[1] != 0) ) {
-      require(ggplot2); require(ggrepel)
-      tT$Cutoff_value <- c("Not Sig", sprintf("FDR < %s & logFC > %s", adj.pval, logFC))[as.numeric(inx)+1]
-      gplot <- ggplot(tT, aes(x = logFC, y = -log10(adj.P.Val))) + geom_point(aes(color = Cutoff_value)) + labs(title ="c") + scale_color_manual(values = c("red", "grey")) +  theme_bw(base_size = 12) + theme(legend.position = "bottom") + geom_hline(yintercept= -log10(adj.pval), linetype="dashed", color = "#FF000050") + geom_vline(xintercept= c(logFC, -logFC), linetype="dashed", color = "#FF000050") 
-      
-      g <- gplot + geom_text_repel(    
-        data = dd <- rbind(tT.up[1:geomTextN, ], tT.down[1:geomTextN, ]),
-        aes(label = Gene),
-        size = 3,
-        box.padding = unit(0.35, "lines"),
-        point.padding = unit(0.3, "lines")
-      ) }
-    print(g)
-    
-    if(dim(Exp)[1] >= heatmapUpN*2 ) {
-      bluered <- colorRampPalette(c("blue", "white", "red"))(256)
-      stats::heatmap(Exp[rbind(tT.down[1:heatmapUpN, ],tT.up[heatmapUpN:1, ])$Gene,], col = bluered, scale = "row", main = sprintf("top%s", heatmapUpN*2), Colv = NA, Rowv=NA    )
-      
-      # if(HUGO) { colnames(d)[1:dim(matGS)[1]] <- .mapid(colnames(d)[1:dim(matGS)[1]]) }
-      
-      # colse=c("#00000020", "#000000", "#0000BF10", "#0000BF30", "#0000BF50", "#0000BF70","#0000BF90","#0000BF")
-      # colTemp <- colse[as.numeric(as.factor(cl[,1]))]
-      # names(colTemp ) <- cl[,1]
-      # colTemp<-list(colTemp); names(colTemp) <- colnames(cl)[1] 
-      
-      # h <- Heatmap( t(scale(t(d<-Exp[rbind(tT.up[1:heatmapUpN, ], tT.down[heatmapUpN:1, ])$Gene,]))),  col = bluered, name="Exprs", rect_gp = rect_gp, cluster_rows = T, cluster_columns = T, show_row_names = T, show_column_names=show_column_names, row_names_gp =gpar(fontsize = 5), split = data.frame(cyl = factor(c(rep('UP', heatmapUpN), rep('DOWN', heatmapUpN)), levels=c('UP','DOWN' ))),gap = unit(1.5, "mm"), top_annotation = HeatmapAnnotation(df=cl, col=colTemp, show_annotation_name = T, annotation_name_gp = gpar(fontsize = 7), annotation_name_side ='left', annotation_height=c(1.5), use_raster = T ) ) 
+  # design=model.matrix(~ .,cl[, cl.inx, drop=F])
+  
+  cl.fac <- convert_df_columns_if_low_unique_numeric_df(cl)
+  design = model.matrix( ~ 0 + ., cl.fac)
+  design
+  contrast = auto_make_pairwise_contrasts_from_design_matrix(design)
+  
+  
+  # In models with an intercept, the intercept always represents the mean of the reference group (the first factor level). When calculating logFC, it is computed as the mean of the second level (e.g., "Treatment") minus the mean of the first level (e.g., "Control"). Therefore, to have "Control" as the reference group, you must ensure that the factor levels are ordered with "Control" first. When using group dummy variables without an intercept, calling topTable with coef set to the first factor level will give logFC values representing the mean log2 expression of group C minus the baseline (0). Therefore, it is necessary to define a contrast matrix explicitly.  If you want to perform pairwise comparisons between groups, defining a contrast matrix is essential.
+  # # design = model.matrix(~ 0 + ., cl[, 1, drop = FALSE]) # Model without intercept including all variables from cl. Without an intercept, there is no reference group, allowing more flexible contrast specification.
+  
+  
+  is_count_data <- function(x) {
+    x <- x[!is.na(x)]
+    all(x >= 0 & x == floor(x))
+  }
+  
+  if (is_count_data(Exp)) {
+    rowCounts = T
+    Exp <- Exp[apply(Exp, 1, mean) > meanFilter, ]
+    Exp <- voom(calcNormFactors(DGEList(Exp)),
+                design = design,
+                plot = T)
+    cat.box(
+      ,
+      "The data appeared to be count data and this was confirmed. Subsequent analyses were performed under the assumption that each row represented count values.\n
 
-      # draw(h)
+Raw count data were first normalized for library size and composition using the Trimmed Mean of M-values (TMM) method implemented in the edgeR package via the calcNormFactors function. This approach adjusts for differences in sequencing depth and sample-specific biases under the assumption that most genes are not differentially expressed. Subsequently, the normalized counts were transformed into log2-counts per million (log2-CPM) with associated precision weights using the voom function from the limma package, facilitating downstream linear modeling and differential expression analysis"
+    )
+  }
+  
+  
+  
+  if (dim(cl)[2] == 1) {
+    # fit <-eBayes(lmFit(Exp, design=design))
+    # tT <- topTable(fit, 2, number = dim(Exp)[1])
+    
+    fit <- eBayes(lmFit(Exp, design))
+    colnames(fit$coefficients)
+    fit2 <- eBayes(contrasts.fit(fit, contrast))
+    colnames(fit2$coefficients)
+    
+    tT <- topTable(fit2,
+                   coef = colnames(fit2$coefficients)[1],
+                   number = dim(Exp)[1])
+    
+    
+    if (!any(names(tT) %in% "logFC"))
+      return(tT)
+    
+    tT$Gene <- rownames(tT)
+    tT.up <- tT[order(tT$logFC, decreasing = T), ]
+    tT.down <- tT[order(tT$logFC), ]
+    inx.up <- which((tT$adj.P.Val < adj.pval) & (tT$logFC > logFC))
+    inx.down <- which((tT$adj.P.Val < adj.pval) & (tT$logFC < -logFC))
+    tT$Cutoff_value <- c("Not Sig")
+    tT$Cutoff_value[inx.up] <-  sprintf("FDR < %s & logFC > %s", adj.pval, logFC)
+    tT$Cutoff_value[inx.down] <-  sprintf("FDR < %s & logFC < -%s", adj.pval, logFC)
+    tttt <<- tT$Cutoff_value
+    tT.filter <- data.frame(tT[c(inx.up, inx.down), ])
+    
+    print(tT.filter)
+    
+    if (PDF) {
+      pdf(
+        file = file.path(getwd(), sprintf("%s.pdf", cname)),
+        width = 5,
+        height = 5
+      )
     }
+    if (plotDEG) {
+      if (rowCounts)
+        Exp <- Exp$E
+      
+      if (any(colnames(tT) == "logFC") && dim(tT.filter)[1] != 0) {
+        require(ggplot2)
+        require(ggrepel)
+        gplot <- ggplot(tT, aes(x = logFC, y = -log10(adj.P.Val))) + geom_point(aes(color = Cutoff_value)) + labs(title =
+                                                                                                                    "c") + scale_color_manual(values = c("blue", "red", "grey")) + theme_bw(base_size = 12) + theme(legend.position = "bottom") + geom_hline(
+                                                                                                                      yintercept = -log10(adj.pval),
+                                                                                                                      linetype = "dashed",
+                                                                                                                      color = "#FF000050"
+                                                                                                                    ) + geom_vline(
+                                                                                                                      xintercept = c(logFC, -logFC),
+                                                                                                                      linetype = "dashed",
+                                                                                                                      color = "#FF000050"
+                                                                                                                    )
+        
+        g <- gplot + geom_text_repel(
+          data = dd <- rbind(tT.up[1:geomTextN, ], tT.down[1:geomTextN, ]),
+          aes(label = Gene),
+          size = 3,
+          box.padding = unit(0.35, "lines"),
+          point.padding = unit(0.3, "lines")
+        )
+      }
+      print(g)
+      
+      if (dim(Exp)[1] >= heatmapUpN * 2) {
+        bluered <- colorRampPalette(c("blue", "white", "red"))(256)
+        # stats::heatmap(Exp[rbind(tT.down[1:heatmapUpN, ],tT.up[heatmapUpN:1, ])$Gene,], col = bluered, scale = "row", main = sprintf("top%s", heatmapUpN*2), Colv = NA, Rowv=NA    )
+        
+        # if(HUGO) { colnames(d)[1:dim(matGS)[1]] <- .mapid(colnames(d)[1:dim(matGS)[1]]) }
+        
+        colse = c(
+          "#00000020",
+          "#000000",
+          "#0000BF10",
+          "#0000BF30",
+          "#0000BF50",
+          "#0000BF70",
+          "#0000BF90",
+          "#0000BF"
+        )
+        colTemp <- colse[as.numeric(as.factor(cl[, 1]))]
+        names(colTemp) <- cl[, 1]
+        colTemp <- list(colTemp)
+        names(colTemp) <- colnames(cl)[1]
+        
+        h <- Heatmap(
+          t(base::scale(t(d <- Exp[rbind(tT.up[1:heatmapUpN, ], tT.down[heatmapUpN:1, ])$Gene, ]))),
+          col = bluered,
+          name = "Exprs",
+          rect_gp = rect_gp,
+          cluster_rows = T,
+          cluster_columns = T,
+          show_row_names = T,
+          show_column_names = show_column_names,
+          row_names_gp = gpar(fontsize = 5),
+          split = data.frame(cyl = factor(
+            c(rep("UP", heatmapUpN), rep("DOWN", heatmapUpN)), levels = c("UP", "DOWN")
+          )),
+          gap = unit(1.5, "mm"),
+          top_annotation = HeatmapAnnotation(
+            df = cl,
+            col = colTemp,
+            show_annotation_name = T,
+            annotation_name_side = "right",
+            annotation_name_gp = gpar(cex = .7)
+          )
+        )
+        
+        draw(h)
+      }
+    }
+    if (PDF) {
+      dev.off()
+    }
+    return(list(
+      fit = fit,
+      tT.filter = tT.filter,
+      tT.up = tT.up,
+      tT.down = tT.down
+    ))
+    
+  } else {
+    # multipleRegression
+    fit <- eBayes(lmFit(Exp, design = design))
+    fit
   }
-  if(PDF) { dev.off() 
-  }
-  return(list(fit = fit, tT.filter= tT.filter, tT.up=tT.up, tT.down=tT.down))
-
-  }
+}
 
 
 
+
+                                                         
                                                          
 #' @export                                                      
 RP.custom <- function(s,FDRcutoff=.1) {
