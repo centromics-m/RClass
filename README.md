@@ -287,7 +287,7 @@ shinyApp(ui, server)
 
 
 
-
+https://github.com/centromics-m/RClass 
 
 # ---- 1. 간단한 plot 그려보기 ----
 
