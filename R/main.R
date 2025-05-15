@@ -84,35 +84,110 @@ loadUrl <- function(url, downloadPath = NA, sep=c("RData"," ", "," , "\t", ";", 
 }
 
 
+
+
+#' @export
+cat.box <- function(title = "CAUTION", text, type = 2) {
+  # ANSI code
+  RESET <- "\033[0m"
+  BOLD <- "\033[1m"
+  RED <- "\033[31m"
+  BLUE <- "\033[34m"
+  YELLOW <- "\033[33m"
+  SILVER <- "\033[37m"
+  GREY <- "\033[90m"
+  WHITE <- "\033[97m"
+  ITALIC <- "\033[3m"
+  
+  `%+%` <- paste0
+  
+  title <- paste(unlist(strsplit(toupper(title), "")), collapse = " ")
+  
+  width <- getOption("width")
+  line <- paste(rep("-", width), collapse = "")
+  
+  if (type == 1) {
+    cat(
+      BOLD %+% "\n\n" %+% WHITE %+% line %+% "//\n" %+%
+        BOLD %+% paste0(" ", title) %+%
+        GREY %+% "\n" %+% line %+% "\n" %+%
+        YELLOW %+% ITALIC %+% paste0(" ", text) %+% RESET %+%
+        WHITE %+% "\n" %+% line %+% "\\\\" %+%
+        RESET %+% BOLD %+% "\n\n\n"
+    )
+  } else {
+    cat(
+      RED %+% BOLD %+% "\n\n\\___" %+%
+        BLUE %+% BOLD %+% "___" %+%
+        SILVER %+% BOLD %+% paste(rep("_", width-3), collapse = "") %+% "\n\n" %+%
+        BOLD %+% paste0(" ", title) %+%
+        GREY %+% "\n" %+% line %+% "\n" %+%
+        YELLOW %+% ITALIC %+% paste0(" ", text) %+%
+        WHITE %+% BOLD %+% "\n" %+% paste(rep("_", width), collapse = "") %+% "\n\n\n" %+%
+        RESET
+    )
+  }
+}
+
+
+             
              
 #' @export 
-makeSimData2 <- function(nGenes = 25, nSamples = 50, contrast = 2, noise = 3, seed=1234, technique = c("microarray", "rna_seq_counts", "sc_rna_seq_counts"))
+makeSimData <- function(nGenes = 150, nSamples = 100, platform = c("microarray", "seq", "sc"), fc = 2, contrast.percentage = 0.2, noise = 1.5, seed = 1234)
 {
+  platform <- match.arg(platform)
   set.seed(seed)
-  technique=match.arg(technique)
-  if(technique == "microarray") {
-    x <- matrix(rlnorm(nGenes * nSamples), nGenes) 
-    x <- apply(x, 2, function(k) { k + rnorm(nGenes, 0, noise * sd(k, na.rm=T)) }) # add noise
-  } else if (technique == "rna_seq_counts") {
-    x <- matrix(rnbinom(nGenes * nSamples, size = 3, mu = 20), nGenes) # rnbinom은 R에서 음이항 분포로부터 난수를 생성하는 함수
+  if (nSamples %% 2 == 1) {  nSamples + 1}
+  group_ <- group_bulk <- group_sc <- rep(c("A", "B"), each=nSamples/2)
+  
+  
+  # 20% 유전자에 contrast 부여
+  de_genes <- sample(1:nGenes, nGenes * contrast.percentage)
+  fc <- fc  # fold change
+  
+  if(platform == "microarray") {   # 1. 마이크로어레이 (log-scale, continuous)
+    microarray <- matrix(rnorm(nGenes * nSamples, mean=6, sd=1), nGenes, nSamples)
+    # contrast 적용
+    microarray[de_genes, group_bulk == "B"] <- microarray[de_genes, group_bulk == "B"] + log2(fc)
+    rownames(microarray) <- paste0("Gene_", 1:nrow(microarray) ) 
+    rownames(microarray)[de_genes] <- paste0("DE_", fc, "_", rownames(microarray)[de_genes]) 
+    x <- microarray 
+    x <- addNoise(x, noise =noise)
+    
+  } else if(platform == "seq") {
+    # 2. bulk RNA-seq (count matrix)
+    bulk <- matrix(rnbinom(nGenes * nSamples, mu=100, size=10), nGenes, nSamples)
+    bulk[de_genes, group_bulk == "B"] <- rnbinom(length(de_genes) * sum(group_bulk == "B"),
+                                                 mu=100*fc, size=10)
+    bulk[de_genes, group_bulk == "B"] <- matrix(bulk[de_genes, group_bulk == "B"], 
+                                                nrow=length(de_genes))
+    rownames(bulk) <- paste0("Gene_", 1:nrow(bulk) ) 
+    rownames(bulk)[de_genes] <- paste0("DE_", fc, "_", rownames(bulk)[de_genes]) 
+    x <- bulk 
+    
   } else {
-    x <- matrix(rnbinom(nGenes * nSamples, size = 3, mu = 20), nGenes)
-    x[sample(1:(nGenes * nSamples), (nGenes * nSamples) * 0.5)] <- 0 # Zero-inflated Negative Binomial Distribution 50%
+    # 3. single cell RNA-seq (count matrix + dropout)
+    sc <- matrix(rpois(nGenes * nSamples, lambda=2), nGenes, nSamples)
+    sc[de_genes, group_sc == "B"] <- rpois(length(de_genes) * sum(group_sc == "B"), lambda=2*fc)
+    sc[de_genes, group_sc == "B"] <- matrix(sc[de_genes, group_sc == "B"], nrow=length(de_genes))
+    rownames(sc) <- paste0("Gene_", 1:nrow(bulk) ) 
+    rownames(sc)[de_genes] <- paste0("DE_", fc, "_", rownames(sc)[de_genes]) 
+    
+    # 드롭아웃 적용
+    dropout <- matrix(runif(nGenes * nSamples) < 0.5, nGenes, nSamples)
+    sc[dropout] <- 0
+    x <-  sc
   }
   
-  rownames(x) <- paste0("G", 1:nGenes)
-  colnames(x) <- paste0("S", 1:nSamples)
+  colnames(x) <- c(paste0(group_[group_ == "A"], 1:length(group_[group_ == "A"])), paste0(group_[group_ == "B"], 1:length(group_[group_ == "B"])))
   
-  x[1:floor(nGenes * 0.2), floor(nSamples/2):nSamples ] <- x[1:floor(nGenes * 0.2), floor(nSamples/2):nSamples]*contrast
-  
-  hist(x, breaks = 30, col = "skyblue", main = technique)
   
   time <- sample(100:5000, nSamples, replace=T)
   status <- sample(0:1, nSamples, replace=T)
   sex = rep(1, nSamples); sex[1:floor(nSamples/2)] <- 0
   y <- data.frame(time=time, status=status, age = sample(3:100, nSamples, replace=T), sex = sex, stage = sample(1:4, nSamples, replace = T))
   rownames(y) <- colnames(x)
-  return(list(exp=x, meta=y))
+  return(list(x=x, y=y))
 }
 
 
