@@ -247,7 +247,16 @@ p_value
 ####################################################### 
 
 # Task 3: Understanding CLT
+
+
 # Generate population data for different distributions
+# runif(10, min = 0, max = 10) # 균등분포: 0 이상 10 이하 구간에서 아무 숫자나 나올 수 있음, 모두 동일한 확률
+# rpois(10, lambda = 3) # 포아송분포: 어떤 콜센터에 시간 평균 3통의 전화 
+# rnbinom(10, size = 2, mu = 5) # 음이항분포: 두 통의 불만 전화를 받기까지, 평균적으로 5개의 일반 전화가 오는 분포 
+# rchisq(10, df = 3) # 카이제곱 분포, 자유도 3
+
+# Generate population data for different distributions
+
 n <- 1000
 population.list <- list(
   unif = runif(n, 1, 100),
