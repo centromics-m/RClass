@@ -182,10 +182,40 @@ abline(v=mean(female.1971.tscores), col=3)
 ####################################################### 
 
 # Task 2: Performing hypothesis testing using permutation test 
-# Generate sample data
-# set.seed(123)  # Set seed for reproducibility
-# group_A <- rnorm(20, mean = 5, sd = 1)
-# group_B <- rnorm(20, mean = 6, sd = 1)
+
+# Task 2-1
+set.seed(123)
+# Task 2-1
+set.seed(123)
+group1 <- seq(0.1, 1, by = 0.1); group1
+group2 <- seq(0.6, 1.5, by = 0.1); group2
+
+
+observed_diff <- mean(group2) - mean(group1)
+combined <- c(group1, group2)
+
+# permutation test
+n_perm <- 10000
+perm_diffs <- numeric(n_perm)
+
+for (i in 1:n_perm) {
+  permuted <- sample(combined)  
+  perm_group1 <- permuted[1:3]
+  perm_group2 <- permuted[4:6]
+  perm_diffs[i] <- mean(perm_group2) - mean(perm_group1)
+}
+
+p_value <- mean(abs(perm_diffs) >= abs(observed_diff))
+p_value
+
+hist(perm_diffs, breaks = 30, main = "Permutation Distribution",
+     xlab = "Mean Difference", col = "lightblue")
+abline(v = observed_diff, col = 2, lwd = 3)
+
+
+
+
+# Task 2-2
 group_A <- male.1971.tscores
 group_B <- female.1971.tscores
 
