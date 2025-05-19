@@ -204,7 +204,14 @@ makeSimData <- function(nGenes = 150, nSamples = 100, platform = c("microarray",
 
 
 
+#' @export
+factorizeDf <- function(df, lengthOfUniqueCut = 5) {
+  if(!is.null(df)) {
+    df.tmp <- data.frame(lapply(df, function(x) { if(length(unique(x)) < lengthOfUniqueCut) {as.factor(x)} else {x}}));  colnames(df.tmp) <- colnames(df); rownames(df.tmp) <- rownames(df); df.tmp  }
+}
 
+
+             
              
 #' @export 
 browseEntrez <- function(entrezIDs) {
