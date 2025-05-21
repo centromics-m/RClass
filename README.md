@@ -326,6 +326,451 @@ shinyApp(ui, server)
 
 
 
+
+####################################################### 
+# 3. Chi-square test
+####################################################### 
+
+# Observed frequency matrix
+observed <- matrix(c(70, 200, 80, 600), 2)
+rownames(observed) <- c("Osteoporosis", "Non-osteoporosis")
+colnames(observed) <- c("Smoke", "Non-smoke")
+observed
+
+# Calculate row sums, column sums, and total sum
+row_sums <- rowSums(observed)
+col_sums <- colSums(observed)
+total_sum <- sum(observed)
+
+# Create expected frequency matrix            
+expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
+# Calculate expected frequencies using a for loop   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
+#  << Try writing the code yourself >>
+ 
+# expected  
+
+# Calculate Chi-squared statistic
+chi_squared <- sum((observed - expected)^2 / expected)
+chi_squared
+
+# Calculate degrees of freedom
+df <- (nrow(observed) - 1) * (ncol(observed) - 1)
+
+# Calculate p-value
+p_value <- 1 - pchisq(chi_squared, df)
+print(paste("p-value:", p_value))
+
+
+
+
+
+
+
+
+
+
+####################################################### 
+# 4. Fisher’s Exact Test
+####################################################### 
+
+observed <- matrix(c(70, 200, 80, 600), nrow = 2)
+rownames(observed) <- c("Osteoporosis", "Non-osteoporosis")
+colnames(observed) <- c("Smoke", "Non-smoke")
+row_sums <- rowSums(observed)
+col_sums <- colSums(observed)
+total_sum <- sum(observed)
+
+# Combination function using product instead of factorial
+nCk <- function(n, k) {
+  if (k == 0) return(1)
+  prod((n - k + 1):n) / prod(1:k)
+}
+
+# Observed count of 'a' = Osteoporosis & Smoke
+a <- observed[1, 1]
+# Fisher’s Exact Test calculates the probabilities for all possible values that ‘a’ can take. Since the total sum and each row and column sum are fixed, knowing only ‘a’ determines all the other cells. Therefore, calculating the probability using just ‘a’ is sufficient. It computes the probabilities for all cases where ‘a’ ranges from its minimum to maximum possible value. Then, it sums the probabilities of the observed ‘a’ value and all more extreme cases to get the p-value. Fisher’s Exact Test calculates the probability of observing the value of ‘a’ (or a more extreme value) by chance. If this probability is very low, we conclude that such a result is unlikely to occur randomly, indicating a statistically significant difference. Since knowing ‘a’ determines ‘b’, ‘c’, and ‘d’, calculating the test based on ‘b’ would yield the same probability distribution.
+
+# Minimum and maximum possible values for 'a'
+min_a <- max(0, col_sums[1] - row_sums[2])
+max_a <- min(row_sums[1], col_sums[1])
+
+# Calculate the probability of the observed table
+observed_prob <- (nCk(col_sums[1], a) * nCk(col_sums[2], row_sums[1] - a)) / nCk(total_sum, row_sums[1])
+
+# Calculate probabilities for all possible values of 'a'
+probs <- numeric(max_a - min_a + 1)
+idx <- 1
+for (x in min_a:max_a) {
+  probs[idx] <- (nCk(col_sums[1], x) * nCk(col_sums[2], row_sums[1] - x)) / nCk(total_sum, row_sums[1])
+  idx <- idx + 1
+}
+
+# Calculate two-sided p-value by summing probabilities less than or equal to the observed probability
+p_value <- sum(probs[probs <= observed_prob])
+
+
+
+
+
+
+####################################################### 
+# 5. U test 
+####################################################### 
+
+U_test <- function(x, y, alternative = "two.sided") {
+  n_x <- length(x)
+  n_y <- length(y)
+  
+  # Calculate ranks for combined data and U statistic for Group x
+  rank_data <- rank(c(x, y))
+  U_x <- sum(rank_data[1:n_x]) - (n_x * (n_x + 1)) / 2
+  
+  # Calculate U statistic for Group y and select the minimum U
+  U_y <- n_x * n_y - U_x
+  U <- min(U_x, U_y)
+  
+# Calculate the mean and standard deviation of U under the null hypothesis 
+#  << Try writing the code yourself >>
+# mean_U <- ...     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q4
+  sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
+  
+  # Calculate p-value based on test alternative
+  z <- (U - mean_U) / sd_U
+  if (alternative == "two.sided") {
+    p_value <- 2 * pnorm(-abs(z))  
+  } else if (alternative == "greater") {
+    p_value <- pnorm(-z)
+  } else if (alternative == "less") {
+    p_value <- pnorm(z)
+  } else {
+    stop("alternative must be 'two.sided', 'greater', or 'less'")
+  }
+  
+  return(p_value)
+}
+
+# Test the function with example data
+x <- c(1, 2, 3, 4)
+y <- c(5, 6, 7, 8)
+U_test(x, y, alternative = "two.sided")
+U_test(x, y, alternative = "greater")
+U_test(x, y, alternative = "less")
+
+# Comparison with R's Base Functions
+getS3method("wilcox.test", "default")
+wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "two.sided")
+wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "greater")
+wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "less")
+
+
+
+
+
+
+
+
+####################################################### 
+# 6. AUC & Confusion_matrix
+#######################################################
+
+calculate_auc <- function(true_labels, probabilities) {
+  # Calculate the ranks of the probabilities (lower values have lower ranks)
+  ranks <- rank(probabilities)
+  
+  # Get the ranks of the positive class instances
+  pos_ranks <- ranks[true_labels == 1]
+  
+  # Count the number of negative class instances
+  neg_count <- sum(true_labels == 0)
+  
+  # Calculate the sum of ranks for the positive class
+  rank_sum_pos <- sum(pos_ranks)
+  
+  # Calculate the U statistic for rank-sum
+  #  << Try writing the code yourself >>
+  #  u_statistic <-              # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
+  
+  # Calculate AUC
+  auc <- u_statistic / (length(pos_ranks) * neg_count)
+  return(auc)
+}
+
+
+true_labels <- c(1, 0, 1, 0, 1, 0, 1, 0)
+probabilities <- c(0.9, 0.4, 0.8, 0.3, 0.6, 0.2, 0.7, 0.1)
+# probabilities <- c(0.51, 0.49, 0.51, 0.49, 0.51, 0.49, 0.51, 0.49)
+# probabilities <- c(0.51, 0.49, 0.51, 0.49, 0.51, 0.49, 0.51, 0.6)
+
+# Calculate AUC
+auc_value <- calculate_auc(true_labels, probabilities)
+cat("AUC:", auc_value, "\n")
+
+# Confusion matrix based on a threshold (0.5 in this case)
+threshold <- 0.5
+predictions <- ifelse(probabilities >= threshold, 1, 0)
+
+# Create confusion matrix
+confusion_matrix <- table(Predicted = predictions, Actual = true_labels)
+print("Confusion Matrix:")
+print(confusion_matrix)
+
+# Extract values from confusion matrix
+TP <- confusion_matrix[2, 2]  # True Positives
+TN <- confusion_matrix[1, 1]  # True Negatives
+FP <- confusion_matrix[2, 1]  # False Positives
+FN <- confusion_matrix[1, 2]  # False Negatives
+
+# Calculate performance metrics
+#  << Try writing the code yourself >>
+# precision <-         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
+accuracy <- (TP + TN) / (TP + TN + FP + FN)
+recall <- TP / (TP + FN)            # Sensitivity or True Positive Rate
+specificity <- TN / (TN + FP)       # True Negative Rate
+false_discovery_rate <- FP / (TP + FP)
+
+# Print the results
+cat("Precision:", precision, "\n")
+cat("Accuracy:", accuracy, "\n")
+cat("Recall (Sensitivity):", recall, "\n")
+cat("Specificity:", specificity, "\n")
+cat("False Discovery Rate:", false_discovery_rate, "\n")
+
+
+
+
+
+
+
+####################################################### 
+# 7. Logistic regression
+#######################################################
+# Sample data
+data <- data.frame(
+  smoke = c(0, 1, 0, 1, 0, 1, 0, 0, 1, 1),    # Binary outcome (smoking or not)
+  age = c(22, 45, 30, 50, 27, 37, 26, 34, 48, 29), # Predictor variable: age
+  income = c(3, 2, 4, 1, 4, 3, 3, 4, 1, 2)   # Predictor variable: income level (1 = low, 5 = high)
+); data 
+
+# Fit binomial logistic regression model
+model <- glm(smoke ~ age + income, family = binomial(link = "logit"), data = data)
+# model <- glm(income ~ age + smoke, data = data)  # default: family = gaussian
+# plot(data$age, data$income, col=ifelse(data$smoke == 1, 1, 2))
+# abline(glm(income ~ age, data = data))
+# newdata <- data.frame(age = 35, smoke = 1)
+# predict(model, newdata)
+
+
+# View model summary
+summary(model)
+exp(coef(model))
+
+
+# Predict probabilities of smoking
+# This will output the predicted probabilities (from 0 to 1) for each individual in the dataset. These probabilities indicate the likelihood of each individual being a smoker based on their age and income.
+predicted_probs <- predict(model, type = "response")
+print(predicted_probs)
+
+# Convert probabilities to binary predictions with a 0.5 threshold
+predicted_labels <- ifelse(predicted_probs > 0.5, 1, 0)
+print(predicted_labels)
+
+# Create the confusion matrix
+true_labels <- data$smoke  # Actual values of the response variable
+confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
+print(confusion_matrix)
+
+auc_value <- calculate_auc(data$smoke, predicted_probs)
+print(paste("AUC:", auc_value)
+
+
+
+
+
+
+
+
+
+
+####################################################### 
+# 8. PCA Analysis and Visualization
+####################################################### 
+
+# Basic PCA Example
+p <- prcomp(matrix(rnorm(100), 5))  # Sample data for demonstration
+plot(p$rotation)  # Plot rotation matrix
+plot(p$x)  # Plot principal components
+biplot(p, scale = FALSE)  # Biplot
+
+# Loading necessary library
+require("factoextra")
+
+# Custom dataset creation and PCA
+x <- t(makeSimData2(25, 50)$exp)  # Transposed data for PCA
+group.col.N <- NULL
+scale <- FALSE
+addEllipses <- FALSE
+gradient.cols <- c("#00AFBB", "#E7B800", "#FC4E07")  # Color scheme for plots
+
+# Run PCA
+pca <- prcomp(x, scale = scale)  # Set scale = TRUE for standardization if variables have different units
+summary(pca)
+print(pca$rotation)
+
+# Eigenvalue Visualization
+p1 <- fviz_eig(pca)  # Show % of variances explained by each PC
+print(p1)
+
+# Define color by groups or quality of representation (cos2)
+if (!is.null(group.col.N) && is.numeric(group.col.N)) {
+  groups <- as.factor(x[[group.col.N]])
+  col.ind <- groups
+} else {
+  col.ind <- "cos2"
+}
+
+# Set label options based on data size
+label.ind <- if (dim(x)[1] > 30) "none" else "all"
+label.var <- if (dim(x)[2] > 30) "none" else "all"
+label.bi <- if (dim(x)[1] > 30 || dim(x)[2] > 30) "none" else "all"
+
+# Sample Plot
+p2 <- fviz_pca_ind(pca, col.ind = col.ind, gradient.cols = gradient.cols, 
+                   repel = TRUE, addEllipses = addEllipses, label = label.ind)
+print(p2)
+
+# Variable Plot
+p3 <- fviz_pca_var(pca, col.var = "contrib", gradient.cols = gradient.cols, 
+                   repel = TRUE, label = label.var)
+print(p3)
+
+
+
+
+
+
+
+
+
+
+
+####################################################### 
+# 9. geneSetTest example using limma-like logic
+####################################################### 
+
+# Testing whether a subset of gene statistics is higher than expected by chance
+
+# Generate example data
+statistics <- rnorm(100)  # All gene statistics
+index <- 1:10  # Indices for the gene set
+statistics[index] <- statistics[index] + 1  # Modify gene set statistics for testing
+alternative <- "mixed"  # Testing alternative hypothesis
+nsim <- 9999  # Number of simulations
+
+# Extract and filter the subset of statistics
+ssel <- statistics[index]
+ssel <- ssel[!is.na(ssel)]
+nsel <- length(ssel)
+if (nsel == 0) return(1)  # If no selected statistics, return p-value of 1
+
+# Set up statistic and function for alternatives
+stat <- statistics[!is.na(statistics)]
+msel <- mean(ssel)
+if (alternative == "either") { 
+  posstat <- abs 
+} else { 
+  posstat <- function(x) x 
+}
+msel <- posstat(msel)
+
+# Simulation to compute p-value
+ntail <- 1
+for (i in 1:nsim) {
+  if (posstat(mean(sample(stat, nsel))) >= msel) {
+    ntail <- ntail + 1
+  }
+}
+p.value <- ntail / (nsim + 1)
+p.value
+
+
+
+
+
+
+
+
+
+
+
+####################################################### 
+# 10. Gene Set Enrichment Analysis
+#######################################################
+
+if (!require("BiocManager", quietly = TRUE))
+  BiocManager::install("clusterProfiler")
+BiocManager::install("enrichplot")
+
+
+# load("LC_NT_RClass.rda")
+# load("pathwayDB_KEGG_202411_RClass.rda")
+
+
+# Create a gene list ordered by expression level in descending order
+geneList = LC_NT_RClass$expr[order(LC_NT_RClass$expr[,1], decreasing = T), 1]
+
+# Reshape the pathway database into a long format and keep specific columns
+df <- reshape::melt(pathwayDB_KEGG_202411_RClass)
+df <- df[, c(2, 1)]
+
+# Run Gene Set Enrichment Analysis (GSEA) with the gene list and pathway data
+# and calculate pairwise term similarities
+GSEA.results <- pairwise_termsim(GSEA(geneList, TERM2GENE=df))
+
+# Plot GSEA results for the top pathway
+gseaplot2(GSEA.results, GSEA.results$ID[1])
+
+# Generate various visualizations of GSEA results
+emapplot(GSEA.results)     # Enrichment map plot
+cnetplot(GSEA.results)     # Concept network plot
+heatplot(GSEA.results)     # Heatmap plot
+ridgeplot(GSEA.results)    # Ridge plot 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 https://github.com/centromics-m/RClass 
 
 # ---- 1. 간단한 plot 그려보기 ----
