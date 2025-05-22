@@ -344,10 +344,12 @@ total_sum <- sum(observed)
 
 # Create expected frequency matrix            
 expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
-# Calculate expected frequencies using a for loop   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q3
-#  << Try writing the code yourself >>
- 
-# expected  
+for (i in 1:nrow(observed)) {
+  for (j in 1:ncol(observed)) {
+    expected[i, j] <- (row_sums[i] * col_sums[j]) / total_sum
+  }
+}  
+expected    
 
 # Calculate Chi-squared statistic
 chi_squared <- sum((observed - expected)^2 / expected)
