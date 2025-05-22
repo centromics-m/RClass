@@ -429,38 +429,19 @@ U_test <- function(x, y, alternative = "two.sided") {
   U_y <- n_x * n_y - U_x
   U <- min(U_x, U_y)
   
-# Calculate the mean and standard deviation of U under the null hypothesis 
-#  << Try writing the code yourself >>
-# mean_U <- ...     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q4
-  sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
-  
-  # Calculate p-value based on test alternative
-  z <- (U - mean_U) / sd_U
-  if (alternative == "two.sided") {
-    p_value <- 2 * pnorm(-abs(z))  
-  } else if (alternative == "greater") {
-    p_value <- pnorm(-z)
-  } else if (alternative == "less") {
-    p_value <- pnorm(z)
-  } else {
-    stop("alternative must be 'two.sided', 'greater', or 'less'")
-  }
-  
-  return(p_value)
+mean_U  <- (n_x * n_y)/2     
+sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
+
+z <- (U - mean_U) / sd_U
+z_critical <- qnorm(0.975)   # 1 - 0.05/2 = 0.975
+
+if (abs(z) > z_critical) {
+  cat("유의함 (귀무가설 기각)\n")
+} else {
+  cat("유의하지 않음 (귀무가설 채택)\n")
 }
 
-# Test the function with example data
-x <- c(1, 2, 3, 4)
-y <- c(5, 6, 7, 8)
-U_test(x, y, alternative = "two.sided")
-U_test(x, y, alternative = "greater")
-U_test(x, y, alternative = "less")
 
-# Comparison with R's Base Functions
-getS3method("wilcox.test", "default")
-wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "two.sided")
-wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "greater")
-wilcox.test(x, y, paired=F, correct = F, exact = F, alternative = "less")
 
 
 
