@@ -440,7 +440,7 @@ if (abs(z) > z_critical) {
 } else {
   cat("유의하지 않음 (귀무가설 채택)\n")
 }
-
+}
 
 
 
