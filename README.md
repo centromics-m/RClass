@@ -178,7 +178,7 @@ abline(v=mean(female.1971.tscores), col=3)
 
 
 ####################################################### 
-# 1-2. Permutation test 
+# 1-2. Permutation test 1-5조
 ####################################################### 
 
 # Task 2: Performing hypothesis testing using permutation test 
@@ -242,9 +242,9 @@ p_value
 
 
 
-####################################################### 
-# 2. Standard Error & Central Limit Theorem Simulation 
-####################################################### 
+##############################################################
+# 2. Standard Error & Central Limit Theorem Simulation  1-5조
+##############################################################
 
 # Task 3: Understanding CLT
 
@@ -328,7 +328,7 @@ shinyApp(ui, server)
 
 
 ####################################################### 
-# 3. Chi-square test
+# 3. Chi-square test  4조
 ####################################################### 
 
 # Observed frequency matrix
@@ -415,8 +415,9 @@ p_value <- sum(probs[probs <= observed_prob])
 
 
 
+
 ####################################################### 
-# 5. U test 
+# 5. U test  2조
 ####################################################### 
 
 U_test <- function(x, y, alternative = "two.sided") {
@@ -453,7 +454,7 @@ if (abs(z) > z_critical) {
 
 
 ####################################################### 
-# 6. AUC & Confusion_matrix
+# 6. AUC & Confusion_matrix  2조
 #######################################################
 
 calculate_auc <- function(true_labels, probabilities) {
@@ -524,8 +525,9 @@ cat("False Discovery Rate:", false_discovery_rate, "\n")
 
 
 
+
 ####################################################### 
-# 7. Logistic regression
+# 7. Logistic regression 4조
 #######################################################
 # Sample data
 data <- data.frame(
@@ -575,7 +577,7 @@ print(paste("AUC:", auc_value)
 
 
 ####################################################### 
-# 8. PCA Analysis and Visualization
+# 8. PCA Analysis and Visualization  1조
 ####################################################### 
 
 # Basic PCA Example
@@ -634,10 +636,46 @@ print(p3)
 
 
 
+####################################################### 
+# 9. Quantile Normalization  3조
+#######################################################
+
+  x= data.frame(matrix(sample(12, replace = T), 4))
+  x <- x[rowSums(x)>0, ]
+
+  tied = "average"
+  rank <- apply(x, 2, rank,ties.method="min"); 
+  if(any(tied %in% c("average", "max"))) rank.max <- apply(x, 2, rank,ties.method="max"); 
+  sorted <- apply(x, 2, sort)
+  sorted.row.mean <- apply(sorted, 1, mean); 
+  x2 <- apply(rank, 2, function(x) sorted.row.mean[x])
+  if(any(tied %in% c("average", "max"))) x2.max <- apply(rank.max, 2, function(x) sorted.row.mean[x])
+  if(tied=="average") { x2 <- (x2+x2.max)/2 } else if (tied=="max"){x2 <- x2.max } else { }
+  
+  if( class(x) == "data.frame") { x2 <- as.data.frame(x2); rownames(x2) <- rownames(x) }
+  x2
+
+
+
+
 
 
 ####################################################### 
-# 9. geneSetTest example using limma-like logic
+# 10. Monty Hall problem: 5조
+#######################################################
+
+
+
+
+
+
+
+
+
+
+
+####################################################### 
+# 11. geneSetTest example using limma-like logic
 ####################################################### 
 
 # Testing whether a subset of gene statistics is higher than expected by chance
@@ -682,11 +720,8 @@ p.value
 
 
 
-
-
-
 ####################################################### 
-# 10. Gene Set Enrichment Analysis
+# 12. Gene Set Enrichment Analysis
 #######################################################
 
 if (!require("BiocManager", quietly = TRUE))
