@@ -581,8 +581,8 @@ true_labels <- data$smoke  # Actual values of the response variable
 confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
 print(confusion_matrix)
 
-auc_value <- calculate_auc(data$smoke, predicted_probs)
-print(paste("AUC:", auc_value))
+# AUC?
+
 
 
 # Fit binomial logistic regression model using the loaded TCGA liver cancer data.  # <<<<<<<<<<<<<<<<<<<<<<< Q7
