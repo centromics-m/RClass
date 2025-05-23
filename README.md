@@ -523,6 +523,24 @@ cat("False Discovery Rate:", false_discovery_rate, "\n")
 
 
 
+####################################################### 
+# TCGA data load: Liver cancer  
+#######################################################
+
+# setwd("~/MS/edu/RClass/data-raw")
+getwd() # Place the downloaded file in the current working directory and load it using the load command.
+# load("LC_NT_RClass.rda")
+# load("pathwayDB_KEGG_202411_RClass.rda")
+
+str(LC_NT_RClass) # structure
+names(LC_NT_RClass)
+
+expr <- LC_NT_RClass$expr
+head(expr)
+View(expr)
+
+meta <- LC_NT_RClass$meta
+View(meta)
 
 
 
@@ -543,7 +561,6 @@ model <- glm(smoke ~ age + income, family = binomial(link = "logit"), data = dat
 # abline(glm(income ~ age, data = data))
 # newdata <- data.frame(age = 35, smoke = 1)
 # predict(model, newdata)
-
 
 # View model summary
 summary(model)
@@ -568,9 +585,7 @@ auc_value <- calculate_auc(data$smoke, predicted_probs)
 print(paste("AUC:", auc_value))
 
 
-
-
-
+# Fit binomial logistic regression model using the loaded TCGA liver cancer data.  # <<<<<<<<<<<<<<<<<<<<<<< Q7
 
 
 
@@ -580,17 +595,20 @@ print(paste("AUC:", auc_value))
 # 8. PCA Analysis and Visualization  1조
 ####################################################### 
 
+
 # Basic PCA Example
-p <- prcomp(matrix(rnorm(100), 5))  # Sample data for demonstration
+p <- prcomp(matrix(rnorm(100), 5), scale. = T)  
 plot(p$rotation)  # Plot rotation matrix
 plot(p$x)  # Plot principal components
 biplot(p, scale = FALSE)  # Biplot
 
+
+# Draw a PCA plot using the loaded TCGA liver cancer data.  # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q8
 # Loading necessary library
 require("factoextra")
 
 # Custom dataset creation and PCA
-x <- t(makeSimData2(25, 50)$exp)  # Transposed data for PCA
+x <- t(expr) # Transposed data for PCA
 group.col.N <- NULL
 scale <- FALSE
 addEllipses <- FALSE
@@ -627,6 +645,8 @@ print(p2)
 p3 <- fviz_pca_var(pca, col.var = "contrib", gradient.cols = gradient.cols, 
                    repel = TRUE, label = label.var)
 print(p3)
+      
+    
 
 
 
@@ -654,6 +674,10 @@ print(p3)
   
   if( class(x) == "data.frame") { x2 <- as.data.frame(x2); rownames(x2) <- rownames(x) }
   x2
+
+
+
+
 
 
 
