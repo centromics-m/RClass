@@ -565,7 +565,7 @@ confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
 print(confusion_matrix)
 
 auc_value <- calculate_auc(data$smoke, predicted_probs)
-print(paste("AUC:", auc_value)
+print(paste("AUC:", auc_value))
 
 
 
