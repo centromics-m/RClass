@@ -178,7 +178,7 @@ abline(v=mean(female.1971.tscores), col=3)
 
 
 ####################################################### 
-# 1-2. Permutation test 1-5조
+# 1-2. Permutation test 
 ####################################################### 
 
 # Task 2: Performing hypothesis testing using permutation test 
@@ -243,7 +243,7 @@ p_value
 
 
 ##############################################################
-# 2. Standard Error & Central Limit Theorem Simulation  1-5조
+# 2. Standard Error & Central Limit Theorem Simulation  
 ##############################################################
 
 # Task 3: Understanding CLT
@@ -328,7 +328,7 @@ shinyApp(ui, server)
 
 
 ####################################################### 
-# 3. Chi-square test  4조
+# 3. Chi-square test 
 ####################################################### 
 
 # Observed frequency matrix
@@ -417,7 +417,7 @@ p_value <- sum(probs[probs <= observed_prob])
 
 
 ####################################################### 
-# 5. U test  2조
+# 5. U test 
 ####################################################### 
 
 U_test <- function(x, y, alternative = "two.sided") {
@@ -454,7 +454,7 @@ if (abs(z) > z_critical) {
 
 
 ####################################################### 
-# 6. AUC & Confusion_matrix  2조
+# 6. AUC & Confusion_matrix 
 #######################################################
 
 calculate_auc <- function(true_labels, probabilities) {
@@ -545,7 +545,7 @@ View(meta)
 
 
 ####################################################### 
-# 7. Logistic regression 4조
+# 7. Logistic regression
 #######################################################
 # Sample data
 set.seed(123)
@@ -596,7 +596,7 @@ print(confusion_matrix)
 
 
 ####################################################### 
-# 8. PCA Analysis and Visualization  1조
+# 8. PCA Analysis and Visualization 
 ####################################################### 
 
 
@@ -661,7 +661,7 @@ print(p3)
 
 
 ####################################################### 
-# 9. Quantile Normalization  3조
+# 9. Quantile Normalization 
 #######################################################
 
   x= data.frame(matrix(sample(12, replace = T), 4))
