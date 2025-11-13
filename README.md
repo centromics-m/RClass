@@ -547,32 +547,37 @@ View(meta)
 ####################################################### 
 # 7. Logistic regression
 #######################################################
-# Sample data
-set.seed(123)
-n <- 50
-data <- data.frame(
-  osteoporesis = rbinom(n, 1, 0.4),       # 0/1 outcome, 40% 발생
-  age = round(rnorm(n, mean=50, sd=10)),  # 나이 30~70 정도
-  income = sample(1:5, n, replace=TRUE),  # 소득 1~5
-  gender = sample(c("M","F"), n, replace=TRUE)  # 범주형 변수
-)
-head(data)
+# age 벡터
+age <- c(35,40,45,50,55,60,37,42,47,52,
+         38,43,48,53,58,36,41,46,51,56)
+
+# income 벡터
+income <- c(1,5,1,1,2,4,2,2,1,4,
+            1,5,4,2,2,3,1,1,3,4)
+
+# osteoporesis 벡터
+osteoporesis <- c(0,1,0,0,1,1,0,1,1,0,
+                  0,0,0,1,1,0,0,1,1,0)
+
+# 데이터프레임 생성
+data <- data.frame(age, income, osteoporesis)
+data
 
 # Fit binomial logistic regression model
-model <- glm(smoke ~ age + income, family = binomial(link = "logit"), data = data)
-# model <- glm(income ~ age + smoke, data = data)  # default: family = gaussian
-# plot(data$age, data$income, col=ifelse(data$smoke == 1, 1, 2))
-# abline(glm(income ~ age, data = data))
-# newdata <- data.frame(age = 35, smoke = 1)
-# predict(model, newdata)
-
-# View model summary
+model <- glm(osteoporesis ~ age + income, data=data, family=binomial)
 summary(model)
 exp(coef(model))
 
 
+# model <- glm(income ~ age + osteoporesis, data = data)  # default: family = gaussian
+# plot(data$age, data$income, col=ifelse(data$osteoporesis == 1, 1, 2))
+# abline(glm(income ~ age, data = data))
+# newdata <- data.frame(age = 35, osteoporesis = 1)
+# predict(model, newdata)
+
+
 # Predict probabilities of smoking
-# This will output the predicted probabilities (from 0 to 1) for each individual in the dataset. These probabilities indicate the likelihood of each individual being a smoker based on their age and income.
+# This will output the predicted probabilities (from 0 to 1) for each individual in the dataset. These probabilities indicate the likelihood of each individual being a osteoporesis based on their age and income.
 predicted_probs <- predict(model, type = "response")
 print(predicted_probs)
 
@@ -581,15 +586,11 @@ predicted_labels <- ifelse(predicted_probs > 0.5, 1, 0)
 print(predicted_labels)
 
 # Create the confusion matrix
-true_labels <- data$smoke  # Actual values of the response variable
+true_labels <- data$osteoporesis  # Actual values of the response variable
 confusion_matrix <- table(Predicted = predicted_labels, Actual = true_labels)
 print(confusion_matrix)
 
 # AUC?
-
-
-
-# Fit binomial logistic regression model using the loaded TCGA liver cancer data.  # <<<<<<<<<<<<<<<<<<<<<<< Q7
 
 
 
