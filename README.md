@@ -548,11 +548,15 @@ View(meta)
 # 7. Logistic regression 4조
 #######################################################
 # Sample data
+set.seed(123)
+n <- 50
 data <- data.frame(
-  smoke = c(0, 1, 0, 1, 0, 1, 0, 0, 1, 1),    # Binary outcome (smoking or not)
-  age = c(22, 45, 30, 50, 27, 37, 26, 34, 48, 29), # Predictor variable: age
-  income = c(3, 2, 4, 1, 4, 3, 3, 4, 1, 2)   # Predictor variable: income level (1 = low, 5 = high)
-); data 
+  osteoporesis = rbinom(n, 1, 0.4),       # 0/1 outcome, 40% 발생
+  age = round(rnorm(n, mean=50, sd=10)),  # 나이 30~70 정도
+  income = sample(1:5, n, replace=TRUE),  # 소득 1~5
+  gender = sample(c("M","F"), n, replace=TRUE)  # 범주형 변수
+)
+head(data)
 
 # Fit binomial logistic regression model
 model <- glm(smoke ~ age + income, family = binomial(link = "logit"), data = data)
