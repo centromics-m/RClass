@@ -100,7 +100,7 @@ q3 <- quantile(sample.male.1971, 0.75) # Third Quartile (Q3)
 iqr <- q3 - q1
 
 # Maximum/minimum boundaries for whiskers
-lower_limit <-     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q1
+lower_limit <-     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Question 1
 upper_limit <- 
 
 
@@ -235,7 +235,7 @@ for (i in 1:n_permutations) {
 hist(perm_diffs)
 abline(v=abs(obs_diff))
 # Calculate p-value
-p_value <-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q2
+p_value <-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Question 2
 p_value
 
 
@@ -344,11 +344,7 @@ total_sum <- sum(observed)
 
 # Create expected frequency matrix            
 expected <- matrix(0, nrow = nrow(observed), ncol = ncol(observed))
-for (i in 1:nrow(observed)) {
-  for (j in 1:ncol(observed)) {
-    expected[i, j] <- (row_sums[i] * col_sums[j]) / total_sum
-  }
-}  
+... # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  Question 3
 expected    
 
 # Calculate Chi-squared statistic
@@ -414,8 +410,6 @@ p_value <- sum(probs[probs <= observed_prob])
 
 
 
-
-
 ####################################################### 
 # 5. U test 
 ####################################################### 
@@ -438,12 +432,7 @@ sd_U <- sqrt((n_x * n_y * (n_x + n_y + 1)) / 12)
 z <- (U - mean_U) / sd_U
 z_critical <- qnorm(0.975)   # 1 - 0.05/2 = 0.975
 
-if (abs(z) > z_critical) {
-  cat("유의함 (귀무가설 기각)\n")
-} else {
-  cat("유의하지 않음 (귀무가설 채택)\n")
-}
-}
+abs(z) > z_critical
 
 
 
@@ -472,8 +461,8 @@ calculate_auc <- function(true_labels, probabilities) {
   
   # Calculate the U statistic for rank-sum
   #  << Try writing the code yourself >>
-  #  u_statistic <-              # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q5
-  
+  #  u_statistic <- rank_sum_pos - (length(pos_ranks) * (length(pos_ranks) + 1)) / 2         
+
   # Calculate AUC
   auc <- u_statistic / (length(pos_ranks) * neg_count)
   return(auc)
@@ -505,8 +494,7 @@ FP <- confusion_matrix[2, 1]  # False Positives
 FN <- confusion_matrix[1, 2]  # False Negatives
 
 # Calculate performance metrics
-#  << Try writing the code yourself >>
-# precision <-         # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Q6
+precision <- TP / (TP + FP)      
 accuracy <- (TP + TN) / (TP + TN + FP + FN)
 recall <- TP / (TP + FN)            # Sensitivity or True Positive Rate
 specificity <- TN / (TN + FP)       # True Negative Rate
