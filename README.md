@@ -16,7 +16,7 @@ output:
 This page provides the supplementary R code and data to reproduce the experiments in the following paper : **Accurate prediction of acquired EGFR TKIs resistance using a pathway-based individualized machine learning approach**  
 -->
 
-## RClass2025
+## RClass2026
 
 **Main Dataset**
 ----------------
