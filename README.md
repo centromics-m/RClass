@@ -48,7 +48,7 @@ devtools::install_github("centromics-m/RClass")
 
 ------------------------------------------------------------------------
 
-## 202505
+## 202604
 
 ``` r
 options(stringsAsFactors = FALSE) 
