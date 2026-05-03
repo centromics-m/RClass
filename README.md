@@ -678,12 +678,35 @@ print(p3)
 
 
 ####################################################### 
-# 10. Monty Hall problem: 5조
+# 10. Simple simulation of the Monty Hall problem
 #######################################################
+# The key idea is that this is not just a random game. The host knows where the car is and gives information  by opening a door that does NOT contain the car.
 
+n <- 10000
+win <- 0
+# Assume the player always switches doors
+for(i in 1:n){
+  car  <- sample(1:3,1)   # Door containing the car
+  pick <- sample(1:3,1)   # Player's first choice
+  # Find a door that the host can open  (not the car and not the player's choice)
+  fordoor <- 1:3
+  for(d in fordoor){
+    if(d != car && d != pick){
+      open <- d
+    }
+  }
 
-
-
+  for(d in fordoor){
+    if(d != pick && d != open){
+      newpick <- d
+    }
+  }
+  
+  if(newpick == car){
+    win <- win + 1
+  }
+}
+win/n
 
 
 
