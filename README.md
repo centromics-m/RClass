@@ -566,6 +566,7 @@ predict(model, newdata, type="response")
 
 # 선형회귀의 핵심 성질: additive structure, 각 변수의 효과가 독립적으로 더해짐. x와 y가 직선 관계여야 한다는 말이 아님. β 구조가 linear (β*x1^2 + β*x1*x2... 결국 본질은 predictors를 β로 가중합한 linear combination으로 outcome을 설명하는 모델. linear in parameters = β₁, β₂가 1차로만 등장 = predictors들의 linear combination)
 # In a GLM, we assume: g(E[Y])=β₀ + β₁x₁ + β₂x₂...This means:  We take the expected value of Y Apply a link function g(⋅). That transformed quantity is a linear combination of predictors. “Linear” refers ONLY to:  β₀ + β₁x₁ + β₂x₂ + … NOT to Y itself.
+# 복잡한 함수도 작은 구간에서는 선형으로 근사 가능. 선형 모델은: 파라미터 적음, 구조 단순= 과적합 위험 낮음, 작은 데이터에도 잘 동작. 확장성이 좋음: 선형 구조는 기반이기 때문에,   logistic regression (log-odds linear), ridge / lasso, GLM,  neural network (linear + non-linear stacking) 모두 “선형 구조 위에 확장”
 # model <- glm(income ~ age + osteoporesis, data = data)  # default: family = gaussian
 # plot(data$age, data$income, col=ifelse(data$osteoporesis == 1, 1, 2))
 # abline(glm(income ~ age, data = data))
